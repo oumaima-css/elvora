@@ -4,9 +4,20 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, MapPin, Phone, User, Mail } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { formatPrice } from '@/lib/utils';
+
+interface CustomerInfo {
+  fullName: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
 
 interface OrderDetails {
   orderId: string;
@@ -14,6 +25,7 @@ interface OrderDetails {
   status: string;
   total?: number;
   items?: number;
+  customerInfo?: CustomerInfo;
 }
 
 const OrderConfirmationPage = () => {
@@ -34,7 +46,8 @@ const OrderConfirmationPage = () => {
         date: new Date().toLocaleDateString(),
         status: 'Paid',
         total: location.state.total,
-        items: location.state.items
+        items: location.state.items,
+        customerInfo: location.state.customerInfo
       });
     } else {
       // If no order details found, this might be a direct page access
@@ -99,6 +112,57 @@ const OrderConfirmationPage = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Customer Information Section */}
+            {orderDetails.customerInfo && (
+              <div className="mt-6 pt-6 border-t">
+                <h3 className="font-medium text-lg mb-3 flex items-center">
+                  <User className="mr-2 h-4 w-4" />
+                  {t('Delivery Information')}
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-start">
+                  <div>
+                    <div className="mb-2 flex items-start">
+                      <User className="mr-2 h-4 w-4 mt-1 flex-shrink-0" />
+                      <div>
+                        <span className="text-muted-foreground block">{t('Full Name')}:</span>
+                        <p className="font-medium">{orderDetails.customerInfo.fullName}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-2 flex items-start">
+                      <Mail className="mr-2 h-4 w-4 mt-1 flex-shrink-0" />
+                      <div>
+                        <span className="text-muted-foreground block">{t('Email')}:</span>
+                        <p className="font-medium">{orderDetails.customerInfo.email}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-2 flex items-start">
+                      <Phone className="mr-2 h-4 w-4 mt-1 flex-shrink-0" />
+                      <div>
+                        <span className="text-muted-foreground block">{t('Phone')}:</span>
+                        <p className="font-medium">{orderDetails.customerInfo.phone}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="mb-2 flex items-start">
+                      <MapPin className="mr-2 h-4 w-4 mt-1 flex-shrink-0" />
+                      <div>
+                        <span className="text-muted-foreground block">{t('Shipping Address')}:</span>
+                        <p className="font-medium">{orderDetails.customerInfo.address}</p>
+                        <p className="font-medium">
+                          {orderDetails.customerInfo.city}, {orderDetails.customerInfo.state} {orderDetails.customerInfo.postalCode}
+                        </p>
+                        <p className="font-medium">{orderDetails.customerInfo.country}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
             
             <div className="mt-6 pt-6 border-t">
               <div className="flex justify-between items-center">

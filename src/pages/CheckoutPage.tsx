@@ -11,35 +11,49 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
-import { CreditCard, CreditCardIcon, Wallet } from 'lucide-react';
+import { CreditCard, CreditCardIcon, Wallet, User, Phone, MapPin, City, Flag } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+
+// Create a schema for form validation
+const checkoutSchema = z.object({
+  fullName: z.string().min(3, { message: "Full name is required" }),
+  email: z.string().email({ message: "Valid email is required" }),
+  phone: z.string().min(5, { message: "Phone number is required" }),
+  address: z.string().min(5, { message: "Address is required" }),
+  city: z.string().min(2, { message: "City is required" }),
+  state: z.string().min(2, { message: "State/Province is required" }),
+  postalCode: z.string().min(3, { message: "Postal code is required" }),
+  country: z.string().min(2, { message: "Country is required" }),
+});
+
+type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 
 const CheckoutPage = () => {
   const { items, getTotalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const { t } = useLanguage();
   
-  const [shippingInfo, setShippingInfo] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    address: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'US'
-  });
-  
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setShippingInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  // Initialize the form with react-hook-form and zod validation
+  const form = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutSchema),
+    defaultValues: {
+      fullName: '',
+      email: '',
+      phone: '',
+      address: '',
+      city: '',
+      state: '',
+      postalCode: '',
+      country: 'US',
+    }
+  });
   
   const processPayment = () => {
     return new Promise<string>((resolve) => {
@@ -51,32 +65,29 @@ const CheckoutPage = () => {
     });
   };
   
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validate form fields
-    const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'state', 'postalCode'];
-    const missingFields = requiredFields.filter(field => !shippingInfo[field as keyof typeof shippingInfo]);
-    
-    if (missingFields.length > 0) {
-      toast.error(t('Please fill in all required fields'));
-      return;
-    }
-    
+  const onSubmit = async (data: CheckoutFormValues) => {
     setIsProcessing(true);
     
     try {
-      // Process the payment
+      // Process the payment (this would be replaced with Stripe)
       const orderId = await processPayment();
       
-      // Clear the cart and redirect to confirmation page
+      // Clear the cart and redirect to confirmation page with all order details
       clearCart();
-      navigate('/order-confirmation', { state: { orderId } });
+      navigate('/order-confirmation', { 
+        state: { 
+          orderId,
+          customerInfo: data,
+          total: getTotalPrice(),
+          items: items.length
+        } 
+      });
       
       // Success message
       toast.success(t('Order placed successfully!'));
     } catch (error) {
       toast.error(t('Payment processing failed. Please try again.'));
+    } finally {
       setIsProcessing(false);
     }
   };
@@ -108,212 +119,268 @@ const CheckoutPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Order Form */}
             <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit}>
-                {/* Shipping Information */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
-                  <h2 className="text-xl font-serif font-medium mb-4">{t('Shipping Information')}</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <Label htmlFor="firstName">{t('First Name')}</Label>
-                      <Input 
-                        id="firstName" 
-                        name="firstName" 
-                        value={shippingInfo.firstName} 
-                        onChange={handleInputChange} 
-                        required 
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  {/* Customer Information */}
+                  <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+                    <h2 className="text-xl font-serif font-medium mb-4">
+                      <User className="inline mr-2" size={20} />
+                      {t('Customer Information')}
+                    </h2>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <FormField
+                        control={form.control}
+                        name="fullName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('Full Name')}</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('Email Address')}</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="email" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="lastName">{t('Last Name')}</Label>
-                      <Input 
-                        id="lastName" 
-                        name="lastName" 
-                        value={shippingInfo.lastName} 
-                        onChange={handleInputChange} 
-                        required 
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <Label htmlFor="email">{t('Email Address')}</Label>
-                    <Input 
-                      id="email" 
-                      name="email" 
-                      type="email" 
-                      value={shippingInfo.email} 
-                      onChange={handleInputChange} 
-                      required 
+                    
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            <Phone className="inline mr-2" size={16} />
+                            {t('Phone Number')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} type="tel" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                   
-                  <div className="mb-4">
-                    <Label htmlFor="address">{t('Street Address')}</Label>
-                    <Input 
-                      id="address" 
-                      name="address" 
-                      value={shippingInfo.address} 
-                      onChange={handleInputChange} 
-                      required 
+                  {/* Shipping Information */}
+                  <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+                    <h2 className="text-xl font-serif font-medium mb-4">
+                      <MapPin className="inline mr-2" size={20} />
+                      {t('Shipping Information')}
+                    </h2>
+                    
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem className="mb-4">
+                          <FormLabel>{t('Street Address')}</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <City className="inline mr-2" size={16} />
+                              {t('City')}
+                            </FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('State/Province')}</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="postalCode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>{t('Postal Code')}</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem className="mt-4">
+                          <FormLabel>
+                            <Flag className="inline mr-2" size={16} />
+                            {t('Country')}
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label htmlFor="city">{t('City')}</Label>
-                      <Input 
-                        id="city" 
-                        name="city" 
-                        value={shippingInfo.city} 
-                        onChange={handleInputChange} 
-                        required 
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="state">{t('State/Province')}</Label>
-                      <Input 
-                        id="state" 
-                        name="state" 
-                        value={shippingInfo.state} 
-                        onChange={handleInputChange} 
-                        required 
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="postalCode">{t('Postal Code')}</Label>
-                      <Input 
-                        id="postalCode" 
-                        name="postalCode" 
-                        value={shippingInfo.postalCode} 
-                        onChange={handleInputChange} 
-                        required 
-                      />
-                    </div>
+                  {/* Payment Method */}
+                  <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
+                    <h2 className="text-xl font-serif font-medium mb-4">{t('Payment Method')}</h2>
+                    
+                    <Tabs defaultValue="credit-card" onValueChange={setPaymentMethod} value={paymentMethod}>
+                      <TabsList className="mb-4 grid grid-cols-3 w-full">
+                        <TabsTrigger value="credit-card" className="flex items-center gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          <span className="hidden sm:inline">{t('Credit Card')}</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="paypal" className="flex items-center gap-2">
+                          <CreditCardIcon className="h-4 w-4" />
+                          <span className="hidden sm:inline">PayPal</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="other" className="flex items-center gap-2">
+                          <Wallet className="h-4 w-4" />
+                          <span className="hidden sm:inline">{t('Other')}</span>
+                        </TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="credit-card">
+                        <div className="mb-4">
+                          <Label htmlFor="card-number">{t('Card Number')}</Label>
+                          <Input 
+                            id="card-number" 
+                            placeholder="1234 5678 9012 3456" 
+                            required 
+                          />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <Label htmlFor="expiry">{t('Expiry Date')}</Label>
+                            <Input 
+                              id="expiry" 
+                              placeholder="MM/YY" 
+                              required 
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="cvc">CVC</Label>
+                            <Input 
+                              id="cvc" 
+                              placeholder="123" 
+                              required 
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="name-on-card">{t('Name on Card')}</Label>
+                          <Input 
+                            id="name-on-card" 
+                            placeholder="John Doe" 
+                            required 
+                          />
+                        </div>
+
+                        <div className="flex flex-wrap gap-3 mt-4">
+                          <div className="border rounded-md p-2 w-12 h-8 flex items-center justify-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" 
+                                 alt="Visa" className="max-h-full max-w-full" />
+                          </div>
+                          <div className="border rounded-md p-2 w-12 h-8 flex items-center justify-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" 
+                                 alt="Mastercard" className="max-h-full max-w-full" />
+                          </div>
+                          <div className="border rounded-md p-2 w-12 h-8 flex items-center justify-center">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/1200px-PayPal.svg.png" 
+                                 alt="American Express" className="max-h-full max-w-full" />
+                          </div>
+                        </div>
+                      </TabsContent>
+                      
+                      <TabsContent value="paypal">
+                        <div className="text-center py-6">
+                          <p className="text-muted-foreground mb-4">
+                            {t('You will be redirected to PayPal to complete your purchase securely.')}
+                          </p>
+                          <Button type="button" className="bg-blue-500 hover:bg-blue-600">
+                            {t('Proceed with PayPal')}
+                          </Button>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="other">
+                        <div className="space-y-4">
+                          <div className="border rounded-md p-4 flex items-center gap-3">
+                            <input type="radio" id="apple-pay" name="other-payment" />
+                            <label htmlFor="apple-pay" className="flex items-center gap-2">
+                              <span className="font-medium">Apple Pay</span>
+                            </label>
+                          </div>
+                          
+                          <div className="border rounded-md p-4 flex items-center gap-3">
+                            <input type="radio" id="google-pay" name="other-payment" />
+                            <label htmlFor="google-pay" className="flex items-center gap-2">
+                              <span className="font-medium">Google Pay</span>
+                            </label>
+                          </div>
+                          
+                          <div className="border rounded-md p-4 flex items-center gap-3">
+                            <input type="radio" id="bank-transfer" name="other-payment" />
+                            <label htmlFor="bank-transfer" className="flex items-center gap-2">
+                              <span className="font-medium">{t('Bank Transfer')}</span>
+                            </label>
+                          </div>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
                   </div>
-                </div>
-                
-                {/* Payment Method */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
-                  <h2 className="text-xl font-serif font-medium mb-4">{t('Payment Method')}</h2>
                   
-                  <Tabs defaultValue="credit-card" onValueChange={setPaymentMethod} value={paymentMethod}>
-                    <TabsList className="mb-4 grid grid-cols-3 w-full">
-                      <TabsTrigger value="credit-card" className="flex items-center gap-2">
-                        <CreditCard className="h-4 w-4" />
-                        <span className="hidden sm:inline">{t('Credit Card')}</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="paypal" className="flex items-center gap-2">
-                        <CreditCardIcon className="h-4 w-4" />
-                        <span className="hidden sm:inline">PayPal</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="other" className="flex items-center gap-2">
-                        <Wallet className="h-4 w-4" />
-                        <span className="hidden sm:inline">{t('Other')}</span>
-                      </TabsTrigger>
-                    </TabsList>
-                    
-                    <TabsContent value="credit-card">
-                      <div className="mb-4">
-                        <Label htmlFor="card-number">{t('Card Number')}</Label>
-                        <Input 
-                          id="card-number" 
-                          placeholder="1234 5678 9012 3456" 
-                          required 
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                          <Label htmlFor="expiry">{t('Expiry Date')}</Label>
-                          <Input 
-                            id="expiry" 
-                            placeholder="MM/YY" 
-                            required 
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="cvc">CVC</Label>
-                          <Input 
-                            id="cvc" 
-                            placeholder="123" 
-                            required 
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <Label htmlFor="name-on-card">{t('Name on Card')}</Label>
-                        <Input 
-                          id="name-on-card" 
-                          placeholder="John Doe" 
-                          required 
-                        />
-                      </div>
-
-                      <div className="flex flex-wrap gap-3 mt-4">
-                        <div className="border rounded-md p-2 w-12 h-8 flex items-center justify-center">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" 
-                               alt="Visa" className="max-h-full max-w-full" />
-                        </div>
-                        <div className="border rounded-md p-2 w-12 h-8 flex items-center justify-center">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" 
-                               alt="Mastercard" className="max-h-full max-w-full" />
-                        </div>
-                        <div className="border rounded-md p-2 w-12 h-8 flex items-center justify-center">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/1200px-PayPal.svg.png" 
-                               alt="American Express" className="max-h-full max-w-full" />
-                        </div>
-                      </div>
-                    </TabsContent>
-                    
-                    <TabsContent value="paypal">
-                      <div className="text-center py-6">
-                        <p className="text-muted-foreground mb-4">
-                          {t('You will be redirected to PayPal to complete your purchase securely.')}
-                        </p>
-                        <Button type="button" className="bg-blue-500 hover:bg-blue-600">
-                          {t('Proceed with PayPal')}
-                        </Button>
-                      </div>
-                    </TabsContent>
-
-                    <TabsContent value="other">
-                      <div className="space-y-4">
-                        <div className="border rounded-md p-4 flex items-center gap-3">
-                          <input type="radio" id="apple-pay" name="other-payment" />
-                          <label htmlFor="apple-pay" className="flex items-center gap-2">
-                            <span className="font-medium">Apple Pay</span>
-                          </label>
-                        </div>
-                        
-                        <div className="border rounded-md p-4 flex items-center gap-3">
-                          <input type="radio" id="google-pay" name="other-payment" />
-                          <label htmlFor="google-pay" className="flex items-center gap-2">
-                            <span className="font-medium">Google Pay</span>
-                          </label>
-                        </div>
-                        
-                        <div className="border rounded-md p-4 flex items-center gap-3">
-                          <input type="radio" id="bank-transfer" name="other-payment" />
-                          <label htmlFor="bank-transfer" className="flex items-center gap-2">
-                            <span className="font-medium">{t('Bank Transfer')}</span>
-                          </label>
-                        </div>
-                      </div>
-                    </TabsContent>
-                  </Tabs>
-                </div>
-                
-                {/* Place Order Button */}
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gold hover:bg-gold-dark text-white h-12 text-lg"
-                  disabled={isProcessing}
-                >
-                  {isProcessing ? t('Processing...') : `${t('Place Order')} • ${formatPrice(getTotalPrice())}`}
-                </Button>
-              </form>
+                  {/* Place Order Button */}
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gold hover:bg-gold-dark text-white h-12 text-lg"
+                    disabled={isProcessing}
+                  >
+                    {isProcessing ? t('Processing...') : `${t('Place Order')} • ${formatPrice(getTotalPrice())}`}
+                  </Button>
+                </form>
+              </Form>
             </div>
             
             {/* Order Summary */}
@@ -348,11 +415,11 @@ const CheckoutPage = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('Shipping')}</span>
-                    <span>{t('Calculated at next step')}</span>
+                    <span>{formatPrice(getTotalPrice() > 10000 ? 0 : 1000)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('Tax')}</span>
-                    <span>{t('Calculated at next step')}</span>
+                    <span>{formatPrice(Math.round(getTotalPrice() * 0.1))}</span>
                   </div>
                 </div>
                 
@@ -360,7 +427,7 @@ const CheckoutPage = () => {
                 
                 <div className="flex justify-between text-lg font-medium">
                   <span>{t('Total')}</span>
-                  <span>{formatPrice(getTotalPrice())}</span>
+                  <span>{formatPrice(getTotalPrice() + (getTotalPrice() > 10000 ? 0 : 1000) + Math.round(getTotalPrice() * 0.1))}</span>
                 </div>
               </div>
             </div>
