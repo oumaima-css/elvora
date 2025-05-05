@@ -1,25 +1,54 @@
 
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import { formatPrice } from '@/lib/utils';
+
+interface OrderDetails {
+  orderId: string;
+  date: string;
+  status: string;
+  total?: number;
+  items?: number;
+}
 
 const OrderConfirmationPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const [orderDetails, setOrderDetails] = useState<OrderDetails>({
+    orderId: 'unknown',
+    date: new Date().toLocaleDateString(),
+    status: 'Paid',
+  });
   
-  // Get the orderId from location state
-  const orderId = location.state?.orderId || 'unknown';
+  useEffect(() => {
+    // Get the orderId and other details from location state
+    if (location.state?.orderId) {
+      setOrderDetails({
+        orderId: location.state.orderId,
+        date: new Date().toLocaleDateString(),
+        status: 'Paid',
+        total: location.state.total,
+        items: location.state.items
+      });
+    } else {
+      // If no order details found, this might be a direct page access
+      // In a real app, you would fetch order details from API
+      console.log('No order details found in location state');
+    }
+  }, [location]);
   
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow flex items-center justify-center py-16">
-        <div className="w-full max-w-lg text-center px-4">
+        <div className="w-full max-w-2xl text-center px-4">
           <div className="mb-6 flex justify-center">
             <CheckCircle className="h-24 w-24 text-green-500" />
           </div>
@@ -33,32 +62,67 @@ const OrderConfirmationPage = () => {
           </p>
           
           <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
-            <h2 className="font-medium mb-4">{t('Order Details')}</h2>
+            <h2 className="font-medium text-xl mb-4">{t('Order Details')}</h2>
             
-            <div className="flex justify-between mb-2">
-              <span className="text-muted-foreground">{t('Order ID')}:</span>
-              <span className="font-medium">{orderId}</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-start">
+              <div>
+                <div className="mb-2">
+                  <span className="text-muted-foreground">{t('Order ID')}:</span>
+                  <p className="font-medium">{orderDetails.orderId}</p>
+                </div>
+                
+                <div className="mb-2">
+                  <span className="text-muted-foreground">{t('Date')}:</span>
+                  <p className="font-medium">{orderDetails.date}</p>
+                </div>
+                
+                <div className="mb-2">
+                  <span className="text-muted-foreground">{t('Status')}:</span>
+                  <p className="font-medium text-green-500">{t(orderDetails.status)}</p>
+                </div>
+              </div>
+              
+              <div>
+                <div className="mb-2">
+                  <span className="text-muted-foreground">{t('Payment Method')}:</span>
+                  <p className="font-medium">{t('Credit Card')}</p>
+                </div>
+                
+                <div className="mb-2">
+                  <span className="text-muted-foreground">{t('Shipping Method')}:</span>
+                  <p className="font-medium">{t('Standard Shipping')}</p>
+                </div>
+                
+                <div className="mb-2">
+                  <span className="text-muted-foreground">{t('Estimated Delivery')}:</span>
+                  <p className="font-medium">{new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</p>
+                </div>
+              </div>
             </div>
             
-            <div className="flex justify-between mb-2">
-              <span className="text-muted-foreground">{t('Date')}:</span>
-              <span className="font-medium">{new Date().toLocaleDateString()}</span>
-            </div>
-            
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">{t('Status')}:</span>
-              <span className="font-medium text-green-500">{t('Paid')}</span>
+            <div className="mt-6 pt-6 border-t">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">{t('Order Total')}:</span>
+                <span className="font-medium text-xl">
+                  {orderDetails.total ? formatPrice(orderDetails.total) : t('Paid')}
+                </span>
+              </div>
             </div>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={() => navigate('/')}>
+            <Button onClick={() => navigate('/')} className="bg-primary">
               {t('Continue Shopping')}
             </Button>
             
             <Button variant="outline" onClick={() => navigate('/orders')}>
               {t('View All Orders')}
             </Button>
+          </div>
+          
+          <div className="mt-8 text-sm text-muted-foreground">
+            <p>{t('A confirmation email has been sent to your email address.')}</p>
+            <p className="mt-2">{t('If you have any questions about your order, please contact our customer service.')}</p>
           </div>
         </div>
       </main>

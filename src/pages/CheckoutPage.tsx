@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
-import { CreditCard, Paypal, Wallet } from 'lucide-react';
+import { CreditCard, CreditCardIcon, Wallet } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 
 const CheckoutPage = () => {
@@ -41,17 +41,44 @@ const CheckoutPage = () => {
     }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const processPayment = () => {
+    return new Promise<string>((resolve) => {
+      setTimeout(() => {
+        // Generate a mock order ID
+        const orderId = Math.random().toString(36).substr(2, 9);
+        resolve(orderId);
+      }, 1500);
+    });
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form fields
+    const requiredFields = ['firstName', 'lastName', 'email', 'address', 'city', 'state', 'postalCode'];
+    const missingFields = requiredFields.filter(field => !shippingInfo[field as keyof typeof shippingInfo]);
+    
+    if (missingFields.length > 0) {
+      toast.error(t('Please fill in all required fields'));
+      return;
+    }
+    
     setIsProcessing(true);
     
-    // Simulate payment processing
-    setTimeout(() => {
-      setIsProcessing(false);
-      toast.success(t('Order placed successfully!'));
+    try {
+      // Process the payment
+      const orderId = await processPayment();
+      
+      // Clear the cart and redirect to confirmation page
       clearCart();
-      navigate('/order-confirmation', { state: { orderId: Math.random().toString(36).substr(2, 9) } });
-    }, 1500);
+      navigate('/order-confirmation', { state: { orderId } });
+      
+      // Success message
+      toast.success(t('Order placed successfully!'));
+    } catch (error) {
+      toast.error(t('Payment processing failed. Please try again.'));
+      setIsProcessing(false);
+    }
   };
   
   if (items.length === 0) {
@@ -177,7 +204,7 @@ const CheckoutPage = () => {
                         <span className="hidden sm:inline">{t('Credit Card')}</span>
                       </TabsTrigger>
                       <TabsTrigger value="paypal" className="flex items-center gap-2">
-                        <Paypal className="h-4 w-4" />
+                        <CreditCardIcon className="h-4 w-4" />
                         <span className="hidden sm:inline">PayPal</span>
                       </TabsTrigger>
                       <TabsTrigger value="other" className="flex items-center gap-2">

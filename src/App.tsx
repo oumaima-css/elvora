@@ -28,6 +28,7 @@ const App = () => (
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+            <Route path="/orders" element={<Navigate to="/auth" replace />} />
             <Route path="/new-arrivals" element={<CatalogPage />} />
             <Route path="/bestsellers" element={<CatalogPage />} />
             <Route path="/auth" element={<AuthPage />} />
