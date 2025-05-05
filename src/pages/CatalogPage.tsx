@@ -129,7 +129,7 @@ const CatalogPage = () => {
                 <p className="text-sm text-muted-foreground">{products.length} products</p>
               </div>
               
-              <ProductGrid products={products} />
+              <ProductGrid products={products} showFilters={true} />
             </div>
           </div>
         </div>

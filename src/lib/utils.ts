@@ -37,3 +37,28 @@ export function getRandomSubset<T>(array: T[], size: number): T[] {
   const shuffled = [...array].sort(() => 0.5 - Math.random())
   return shuffled.slice(0, size)
 }
+
+// Languages supported by the application
+export type SupportedLanguage = 'en' | 'fr' | 'ar';
+
+// Current language storage key
+export const LANGUAGE_STORAGE_KEY = 'evermore-language';
+
+// Get current language from localStorage or default to English
+export function getCurrentLanguage(): SupportedLanguage {
+  const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return (stored as SupportedLanguage) || 'en';
+}
+
+// Set current language in localStorage
+export function setCurrentLanguage(language: SupportedLanguage) {
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  document.documentElement.lang = language;
+  
+  // For RTL support (Arabic)
+  if (language === 'ar') {
+    document.documentElement.dir = 'rtl';
+  } else {
+    document.documentElement.dir = 'ltr';
+  }
+}
