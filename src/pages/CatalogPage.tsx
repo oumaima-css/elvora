@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductGrid from '@/components/ProductGrid';
@@ -8,35 +8,65 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { 
   getProductsByGender, 
+  getAllProducts,
   getProductsByCategory,
   getProductsByGenderAndCategory,
-  getCategoriesByGender, 
+  getCategoriesByGender,
+  getAllCategories, 
   getCategoryDisplayName,
   Gender,
   ProductCategory
 } from '@/data/products';
 import { capitalizeFirstLetter } from '@/lib/utils';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, Users } from 'lucide-react';
 
 const CatalogPage = () => {
   const { gender } = useParams<{ gender: string }>();
-  const validGender = gender as Gender;
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  // Convert the gender param to a valid Gender type or set to "all"
+  const currentGender = gender as Gender | undefined;
+  const [selectedGender, setSelectedGender] = useState<Gender | "all">(
+    currentGender && (currentGender === "men" || currentGender === "women") 
+      ? currentGender 
+      : "all"
+  );
   
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   
+  // Update URL when gender changes
   useEffect(() => {
-    if (validGender) {
-      if (selectedCategory) {
-        setProducts(getProductsByGenderAndCategory(validGender, selectedCategory));
-      } else {
-        setProducts(getProductsByGender(validGender));
-      }
-      setCategories(getCategoriesByGender(validGender));
+    if (selectedGender !== "all" && gender !== selectedGender) {
+      navigate(`/catalog/${selectedGender}`, { replace: true });
+    } else if (selectedGender === "all" && gender) {
+      navigate('/catalog', { replace: true });
     }
-  }, [validGender, selectedCategory]);
+  }, [selectedGender, gender, navigate]);
+  
+  // Update products and categories based on gender and category selection
+  useEffect(() => {
+    if (selectedGender === "all") {
+      // Get all products and categories when "all" is selected
+      if (selectedCategory) {
+        setProducts(getProductsByCategory(selectedCategory));
+      } else {
+        setProducts(getAllProducts());
+      }
+      setCategories(getAllCategories());
+    } else {
+      // Get gender-specific products and categories
+      if (selectedCategory) {
+        setProducts(getProductsByGenderAndCategory(selectedGender, selectedCategory));
+      } else {
+        setProducts(getProductsByGender(selectedGender));
+      }
+      setCategories(getCategoriesByGender(selectedGender));
+    }
+  }, [selectedGender, selectedCategory]);
   
   const toggleCategory = (category: ProductCategory) => {
     if (selectedCategory === category) {
@@ -50,6 +80,11 @@ const CatalogPage = () => {
     setSelectedCategory(null);
   };
   
+  const switchGender = (gender: Gender | "all") => {
+    setSelectedGender(gender);
+    setSelectedCategory(null); // Reset category when switching gender
+  };
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -59,13 +94,45 @@ const CatalogPage = () => {
         <div className="relative bg-evermore-dark text-white py-16">
           <div className="luxury-container text-center">
             <h1 className="text-4xl md:text-5xl font-serif font-medium mb-4">
-              {validGender === 'men' ? "Men's Collection" : "Women's Collection"}
+              {selectedGender === "men" 
+                ? "Men's Collection" 
+                : selectedGender === "women" 
+                  ? "Women's Collection" 
+                  : "All Collections"}
             </h1>
             <p className="text-lg text-white/80 max-w-2xl mx-auto">
-              {validGender === 'men'
+              {selectedGender === "men"
                 ? "Discover our premium selection of accessories crafted for the modern gentleman."
-                : "Explore our luxurious collection designed for the contemporary woman."}
+                : selectedGender === "women"
+                ? "Explore our luxurious collection designed for the contemporary woman."
+                : "Browse our complete catalog of premium accessories for everyone."}
             </p>
+            
+            {/* Gender selection tabs */}
+            <div className="mt-8 flex justify-center gap-4">
+              <Button 
+                variant={selectedGender === "all" ? "default" : "outline"}
+                onClick={() => switchGender("all")}
+                className="px-8"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                All
+              </Button>
+              <Button 
+                variant={selectedGender === "men" ? "default" : "outline"}
+                onClick={() => switchGender("men")}
+                className="px-8"
+              >
+                Men
+              </Button>
+              <Button 
+                variant={selectedGender === "women" ? "default" : "outline"}
+                onClick={() => switchGender("women")}
+                className="px-8"
+              >
+                Women
+              </Button>
+            </div>
           </div>
         </div>
         
@@ -124,7 +191,9 @@ const CatalogPage = () => {
                 <h2 className="text-2xl font-serif">
                   {selectedCategory 
                     ? getCategoryDisplayName(selectedCategory) 
-                    : `All ${capitalizeFirstLetter(validGender)}'s Items`}
+                    : selectedGender !== "all"
+                      ? `All ${capitalizeFirstLetter(selectedGender)}'s Items`
+                      : "All Items"}
                 </h2>
                 <p className="text-sm text-muted-foreground">{products.length} products</p>
               </div>
