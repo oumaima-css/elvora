@@ -1,4 +1,3 @@
-
 export type ProductCategory = 
   // Men's categories
   | 'portfolios' 
@@ -210,6 +209,16 @@ export const getCategoriesByGender = (gender: Gender): ProductCategory[] => {
     .filter((product) => product.gender === gender)
     .forEach((product) => uniqueCategories.add(product.category));
   return Array.from(uniqueCategories);
+};
+
+export const getAllCategories = (): ProductCategory[] => {
+  const uniqueCategories = new Set<ProductCategory>();
+  products.forEach(product => uniqueCategories.add(product.category));
+  return Array.from(uniqueCategories);
+};
+
+export const getAllProducts = (): Product[] => {
+  return [...products];
 };
 
 export const getCategoryDisplayName = (category: ProductCategory): string => {
