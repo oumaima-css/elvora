@@ -20,6 +20,23 @@ import {
 import { capitalizeFirstLetter } from '@/lib/utils';
 import { Filter, X, Users } from 'lucide-react';
 
+// Define the specific categories for each gender
+const womenCategories: ProductCategory[] = [
+  'bags-purses',
+  'cosmetics',
+  'beauty-skincare',
+  'jewelry'
+];
+
+const menCategories: ProductCategory[] = [
+  'portfolios',
+  'watches',
+  'pants-belts',
+  'leather-wallets',
+  'backpacks',
+  'computer-bags'
+];
+
 const CatalogPage = () => {
   const { gender } = useParams<{ gender: string }>();
   const location = useLocation();
@@ -50,21 +67,32 @@ const CatalogPage = () => {
   // Update products and categories based on gender and category selection
   useEffect(() => {
     if (selectedGender === "all") {
-      // Get all products and categories when "all" is selected
+      // Get all products when "all" is selected
       if (selectedCategory) {
         setProducts(getProductsByCategory(selectedCategory));
       } else {
         setProducts(getAllProducts());
       }
-      setCategories(getAllCategories());
-    } else {
-      // Get gender-specific products and categories
+      // For "all", we want to show both men's and women's categories
+      setCategories([...menCategories, ...womenCategories]);
+    } else if (selectedGender === "women") {
+      // Get women-specific products and categories
       if (selectedCategory) {
         setProducts(getProductsByGenderAndCategory(selectedGender, selectedCategory));
       } else {
         setProducts(getProductsByGender(selectedGender));
       }
-      setCategories(getCategoriesByGender(selectedGender));
+      // Only show women's categories
+      setCategories(womenCategories);
+    } else {
+      // Get men-specific products and categories
+      if (selectedCategory) {
+        setProducts(getProductsByGenderAndCategory(selectedGender, selectedCategory));
+      } else {
+        setProducts(getProductsByGender(selectedGender));
+      }
+      // Only show men's categories
+      setCategories(menCategories);
     }
   }, [selectedGender, selectedCategory]);
   

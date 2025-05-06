@@ -3,9 +3,9 @@ import { Product } from "@/data/products";
 import ProductCard from "./ProductCard";
 import { useState } from "react";
 import { Input } from "./ui/input";
-import { Slider } from "./ui/slider";
 import { Label } from "./ui/label";
 import { formatPrice } from "@/lib/utils";
+import { Button } from "./ui/button";
 
 interface ProductGridProps {
   products: Product[];
@@ -15,9 +15,10 @@ interface ProductGridProps {
 
 const ProductGrid = ({ products: initialProducts, title, showFilters = false }: ProductGridProps) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 500]);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(500);
   const [selectedGender, setSelectedGender] = useState<"all" | "men" | "women">("all");
-
+  
   // Apply filters to products
   const filteredProducts = initialProducts.filter((product) => {
     // Filter by search query
@@ -25,7 +26,7 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
                           product.description.toLowerCase().includes(searchQuery.toLowerCase());
     
     // Filter by price range
-    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+    const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
     
     // Filter by gender
     const matchesGender = selectedGender === "all" || product.gender === selectedGender;
@@ -42,10 +43,20 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
     );
   }
   
-  // Find the min and max price from all products for the slider
+  // Find the min and max price from all products
   const allPrices = initialProducts.map(p => p.price);
-  const minPrice = Math.min(...allPrices);
-  const maxPrice = Math.max(...allPrices);
+  const lowestPrice = Math.min(...allPrices);
+  const highestPrice = Math.max(...allPrices);
+  
+  // Handle price range update
+  const handlePriceRangeUpdate = () => {
+    // Validate that min price is not greater than max price
+    if (minPrice > maxPrice) {
+      // Swap the values if min is greater than max
+      setMinPrice(maxPrice);
+      setMaxPrice(minPrice);
+    }
+  };
   
   return (
     <div className="py-8">
@@ -102,18 +113,39 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
               </div>
             </div>
             
-            {/* Filter by price range */}
+            {/* Filter by price range with custom inputs */}
             <div>
-              <Label className="mb-2 block">Price Range: {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}</Label>
-              <Slider
-                defaultValue={[minPrice, maxPrice]}
-                min={minPrice}
-                max={maxPrice}
-                step={5}
-                value={priceRange}
-                onValueChange={setPriceRange}
-                className="py-4"
-              />
+              <Label className="mb-2 block">Price Range: {formatPrice(minPrice)} - {formatPrice(maxPrice)}</Label>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(Number(e.target.value))}
+                  placeholder="Min"
+                  min={0}
+                  className="w-1/3"
+                />
+                <span>to</span>
+                <Input
+                  type="number"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  placeholder="Max"
+                  min={0}
+                  className="w-1/3"
+                />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handlePriceRangeUpdate}
+                  className="shrink-0"
+                >
+                  Apply
+                </Button>
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Price range: {formatPrice(lowestPrice)} - {formatPrice(highestPrice)}
+              </div>
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 export type ProductCategory = 
   // Men's categories
   | 'portfolios' 
@@ -223,12 +224,14 @@ export const getAllProducts = (): Product[] => {
 
 export const getCategoryDisplayName = (category: ProductCategory): string => {
   const displayNames: Record<ProductCategory, string> = {
+    // Men's categories
     'portfolios': 'Portfolios',
     'watches': 'Watches',
     'pants-belts': 'Pants & Belts',
     'leather-wallets': 'Leather Wallets',
     'backpacks': 'Backpacks',
     'computer-bags': 'Computer Bags',
+    // Women's categories
     'bags-purses': 'Bags & Purses',
     'cosmetics': 'Cosmetics',
     'beauty-skincare': 'Beauty & Skincare',
