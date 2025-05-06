@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { formatPrice } from '@/lib/utils';
 import { toast } from 'sonner';
-import { CreditCard, CreditCardIcon, Wallet, User, Phone, MapPin, City, Flag } from 'lucide-react';
+import { CreditCard, CreditCardIcon, Wallet, User, Phone, MapPin, Building, Flag } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -203,7 +203,7 @@ const CheckoutPage = () => {
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              <City className="inline mr-2" size={16} />
+                              <Building className="inline mr-2" size={16} />
                               {t('City')}
                             </FormLabel>
                             <FormControl>
