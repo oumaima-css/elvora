@@ -5,20 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 const Cart = () => {
   const { items, getTotalItems, getTotalPrice, clearCart } = useCart();
+  const { t } = useLanguage();
   
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh]">
         <ShoppingBag className="h-16 w-16 text-muted-foreground mb-4" />
-        <h3 className="text-xl font-medium text-evermore-dark mb-2">Your cart is empty</h3>
+        <h3 className="text-xl font-medium text-evermore-dark mb-2">{t('your_cart_is_empty')}</h3>
         <p className="text-muted-foreground mb-6 text-center">
-          Looks like you haven't added any products to your cart yet.
+          {t('add_some_items')}
         </p>
         <Button asChild className="bg-gold hover:bg-gold-dark">
-          <Link to="/catalog/men">Start Shopping</Link>
+          <Link to="/catalog/men">{t('continue_shopping')}</Link>
         </Button>
       </div>
     );
@@ -28,7 +30,7 @@ const Cart = () => {
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between pb-4 border-b">
         <h2 className="font-serif text-xl font-medium">
-          Your Cart ({getTotalItems()})
+          {t('cart')} ({getTotalItems()})
         </h2>
         <Button 
           variant="ghost" 
@@ -36,7 +38,7 @@ const Cart = () => {
           onClick={clearCart}
           className="text-sm hover:text-destructive"
         >
-          Clear All
+          {t('clear_all')}
         </Button>
       </div>
       
@@ -57,21 +59,21 @@ const Cart = () => {
       
       <div className="border-t pt-4 mt-auto">
         <div className="flex justify-between mb-2">
-          <span className="text-muted-foreground">Subtotal</span>
+          <span className="text-muted-foreground">{t('subtotal')}</span>
           <span className="font-medium">{formatPrice(getTotalPrice())}</span>
         </div>
         <div className="flex justify-between mb-4">
-          <span className="text-muted-foreground">Shipping</span>
-          <span>Calculated at checkout</span>
+          <span className="text-muted-foreground">{t('shipping')}</span>
+          <span>{t('free')}</span>
         </div>
         <div className="flex justify-between text-lg font-medium mb-6">
-          <span>Total</span>
+          <span>{t('total')}</span>
           <span>{formatPrice(getTotalPrice())}</span>
         </div>
         
         <Button asChild className="w-full bg-evermore-dark hover:bg-black text-white">
           <Link to="/checkout">
-            Proceed to Checkout
+            {t('checkout')}
           </Link>
         </Button>
       </div>

@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { formatPrice } from "@/lib/utils";
 import { Button } from "./ui/button";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ProductGridProps {
   products: Product[];
@@ -14,6 +15,7 @@ interface ProductGridProps {
 }
 
 const ProductGrid = ({ products: initialProducts, title, showFilters = false }: ProductGridProps) => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(500);
@@ -37,8 +39,8 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
   if (initialProducts.length === 0) {
     return (
       <div className="text-center py-16">
-        <h2 className="text-2xl font-serif font-medium text-evermore-dark">No products found</h2>
-        <p className="text-gray-500 mt-2">Try adjusting your filters or check back later for new arrivals.</p>
+        <h2 className="text-2xl font-serif font-medium text-evermore-dark">{t('no_products_found')}</h2>
+        <p className="text-gray-500 mt-2">{t('try_adjusting_filters')}</p>
       </div>
     );
   }
@@ -71,11 +73,11 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Search by name */}
             <div>
-              <Label htmlFor="search" className="mb-2 block">Search Products</Label>
+              <Label htmlFor="search" className="mb-2 block">{t('search_products')}</Label>
               <Input
                 id="search"
                 type="text"
-                placeholder="Search by product name..."
+                placeholder={t('search_products')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full"
@@ -84,7 +86,7 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
             
             {/* Filter by gender */}
             <div>
-              <Label className="mb-2 block">Filter by Gender</Label>
+              <Label className="mb-2 block">{t('filter_by_gender')}</Label>
               <div className="flex gap-2">
                 <button
                   onClick={() => setSelectedGender("all")}
@@ -92,7 +94,7 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
                     selectedGender === "all" ? "bg-evermore-dark text-white" : "bg-white"
                   }`}
                 >
-                  All
+                  {t('all')}
                 </button>
                 <button
                   onClick={() => setSelectedGender("men")}
@@ -100,7 +102,7 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
                     selectedGender === "men" ? "bg-evermore-dark text-white" : "bg-white"
                   }`}
                 >
-                  Men
+                  {t('men')}
                 </button>
                 <button
                   onClick={() => setSelectedGender("women")}
@@ -108,29 +110,29 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
                     selectedGender === "women" ? "bg-evermore-dark text-white" : "bg-white"
                   }`}
                 >
-                  Women
+                  {t('women')}
                 </button>
               </div>
             </div>
             
             {/* Filter by price range with custom inputs */}
             <div>
-              <Label className="mb-2 block">Price Range: {formatPrice(minPrice)} - {formatPrice(maxPrice)}</Label>
+              <Label className="mb-2 block">{t('price_range')}: {formatPrice(minPrice)} - {formatPrice(maxPrice)}</Label>
               <div className="flex items-center gap-2">
                 <Input
                   type="number"
                   value={minPrice}
                   onChange={(e) => setMinPrice(Number(e.target.value))}
-                  placeholder="Min"
+                  placeholder={t('min')}
                   min={0}
                   className="w-1/3"
                 />
-                <span>to</span>
+                <span>{t('to')}</span>
                 <Input
                   type="number"
                   value={maxPrice}
                   onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  placeholder="Max"
+                  placeholder={t('max')}
                   min={0}
                   className="w-1/3"
                 />
@@ -140,11 +142,11 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
                   onClick={handlePriceRangeUpdate}
                   className="shrink-0"
                 >
-                  Apply
+                  {t('apply')}
                 </Button>
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                Price range: {formatPrice(lowestPrice)} - {formatPrice(highestPrice)}
+                {t('price_range')}: {formatPrice(lowestPrice)} - {formatPrice(highestPrice)}
               </div>
             </div>
           </div>
@@ -160,8 +162,8 @@ const ProductGrid = ({ products: initialProducts, title, showFilters = false }: 
           ))
         ) : (
           <div className="col-span-full text-center py-16">
-            <h3 className="text-xl font-medium text-gray-700">No products match your filters</h3>
-            <p className="text-gray-500 mt-2">Try adjusting your search criteria.</p>
+            <h3 className="text-xl font-medium text-gray-700">{t('no_products_match')}</h3>
+            <p className="text-gray-500 mt-2">{t('adjust_criteria')}</p>
           </div>
         )}
       </div>

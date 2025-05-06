@@ -103,7 +103,7 @@ const OrderConfirmationPage = () => {
                 
                 <div className="mb-2">
                   <span className="text-muted-foreground">{t('Shipping Method')}:</span>
-                  <p className="font-medium">{t('Standard Shipping')}</p>
+                  <p className="font-medium">{t('Standard Shipping')} ({t('free')})</p>
                 </div>
                 
                 <div className="mb-2">
