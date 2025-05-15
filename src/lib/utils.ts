@@ -62,3 +62,19 @@ export function setCurrentLanguage(language: SupportedLanguage) {
     document.documentElement.dir = 'ltr';
   }
 }
+
+// Default translations for discount section
+export const discountTranslations = {
+  en: {
+    special_sale: "Special Sale",
+    discount_desc: "Get {{percent}} OFF on selected items",
+  },
+  fr: {
+    special_sale: "Vente Spéciale",
+    discount_desc: "Obtenez {{percent}} de réduction sur certains articles",
+  },
+  ar: {
+    special_sale: "عرض خاص",
+    discount_desc: "احصل على خصم {{percent}} على منتجات مختارة",
+  }
+};
