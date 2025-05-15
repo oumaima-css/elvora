@@ -16,7 +16,7 @@ import {
   Gender,
   ProductCategory
 } from '@/data/products';
-import { capitalizeFirstLetter } from '@/lib/utils';
+import { capitalizeFirstLetter, discountTranslations } from '@/lib/utils';
 import { Filter, Percent, Users, X } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -41,7 +41,7 @@ const CatalogPage = () => {
   const { gender } = useParams<{ gender: string }>();
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   // Convert the gender param to a valid Gender type or set to "all"
   const currentGender = gender as Gender | undefined;
@@ -173,8 +173,12 @@ const CatalogPage = () => {
                 <Percent className="h-6 w-6 text-red-600" />
               </div>
               <div className="text-center">
-                <h2 className="text-2xl font-serif font-bold">{t("special_sale")}</h2>
-                <p className="text-lg">{t("discount_desc", { percent: "80%" })}</p>
+                <h2 className="text-2xl font-serif font-bold">
+                  {discountTranslations[language].special_sale}
+                </h2>
+                <p className="text-lg">
+                  {discountTranslations[language].discount_desc.replace('{{percent}}', '80%')}
+                </p>
               </div>
             </div>
           </div>

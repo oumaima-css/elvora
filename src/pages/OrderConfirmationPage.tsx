@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, MapPin, Phone, User, Mail } from 'lucide-react';
+import { CheckCircle, MapPin, Phone, User, Mail, Tag } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { formatPrice } from '@/lib/utils';
 
@@ -24,6 +24,8 @@ interface OrderDetails {
   date: string;
   status: string;
   total?: number;
+  originalTotal?: number;
+  discountPercent?: number;
   items?: number;
   customerInfo?: CustomerInfo;
 }
@@ -46,6 +48,8 @@ const OrderConfirmationPage = () => {
         date: new Date().toLocaleDateString(),
         status: 'Paid',
         total: location.state.total,
+        originalTotal: location.state.originalTotal,
+        discountPercent: location.state.discountPercent,
         items: location.state.items,
         customerInfo: location.state.customerInfo
       });
@@ -103,7 +107,7 @@ const OrderConfirmationPage = () => {
                 
                 <div className="mb-2">
                   <span className="text-muted-foreground">{t('Shipping Method')}:</span>
-                  <p className="font-medium">{t('Standard Shipping')} ({t('free')})</p>
+                  <p className="font-medium">{t('Standard Shipping')} ({t('Free')})</p>
                 </div>
                 
                 <div className="mb-2">
@@ -165,6 +169,20 @@ const OrderConfirmationPage = () => {
             )}
             
             <div className="mt-6 pt-6 border-t">
+              {/* Display discount information if applicable */}
+              {orderDetails.discountPercent && orderDetails.originalTotal && (
+                <div className="mb-3 flex items-center justify-between">
+                  <div className="flex items-center text-red-500">
+                    <Tag className="mr-2 h-4 w-4" />
+                    <span>{t('Discount Applied')}: {orderDetails.discountPercent}%</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-muted-foreground line-through">{formatPrice(orderDetails.originalTotal)}</div>
+                    <p className="text-red-500">-{formatPrice(orderDetails.originalTotal * orderDetails.discountPercent / 100)}</p>
+                  </div>
+                </div>
+              )}
+              
               <div className="flex justify-between items-center">
                 <span className="font-medium">{t('Order Total')}:</span>
                 <span className="font-medium text-xl">

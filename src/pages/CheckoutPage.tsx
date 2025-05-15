@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -9,9 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, calculateDiscountedPrice, VALID_DISCOUNT_CODES, discountCodeTranslations } from '@/lib/utils';
 import { toast } from 'sonner';
-import { CreditCard, CreditCardIcon, Wallet, User, Phone, MapPin, Building, Flag } from 'lucide-react';
+import { CreditCard, CreditCardIcon, Wallet, User, Phone, MapPin, Building, Flag, Tag } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -35,10 +34,12 @@ type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 const CheckoutPage = () => {
   const { items, getTotalPrice, clearCart } = useCart();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
+  const [discountCode, setDiscountCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<number | null>(null);
   
   // Initialize the form with react-hook-form and zod validation
   const form = useForm<CheckoutFormValues>({
@@ -72,13 +73,21 @@ const CheckoutPage = () => {
       // Process the payment (this would be replaced with Stripe)
       const orderId = await processPayment();
       
+      // Calculate the final amount with discount
+      const subtotal = getTotalPrice();
+      const total = appliedDiscount !== null 
+        ? calculateDiscountedPrice(subtotal, appliedDiscount) 
+        : subtotal;
+      
       // Clear the cart and redirect to confirmation page with all order details
       clearCart();
       navigate('/order-confirmation', { 
         state: { 
           orderId,
           customerInfo: data,
-          total: getTotalPrice(),
+          total: total,
+          originalTotal: subtotal,
+          discountPercent: appliedDiscount,
           items: items.length
         } 
       });
@@ -91,6 +100,30 @@ const CheckoutPage = () => {
       setIsProcessing(false);
     }
   };
+  
+  const applyDiscountCode = () => {
+    if (!discountCode) return;
+    
+    if (discountCode in VALID_DISCOUNT_CODES) {
+      const discountValue = VALID_DISCOUNT_CODES[discountCode as keyof typeof VALID_DISCOUNT_CODES];
+      setAppliedDiscount(discountValue);
+      toast.success(discountCodeTranslations[language].discount_applied);
+    } else {
+      toast.error(discountCodeTranslations[language].invalid_code);
+    }
+  };
+  
+  const removeDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountCode('');
+    toast.info(discountCodeTranslations[language].discount_removed);
+  };
+  
+  // Calculate the final price
+  const subtotal = getTotalPrice();
+  const taxAmount = Math.round(subtotal * 0.1);
+  const discountAmount = appliedDiscount ? (subtotal * appliedDiscount / 100) : 0;
+  const finalTotal = subtotal + taxAmount - discountAmount;
   
   if (items.length === 0) {
     return (
@@ -377,7 +410,7 @@ const CheckoutPage = () => {
                     className="w-full bg-gold hover:bg-gold-dark text-white h-12 text-lg"
                     disabled={isProcessing}
                   >
-                    {isProcessing ? t('Processing...') : `${t('Place Order')} • ${formatPrice(getTotalPrice())}`}
+                    {isProcessing ? t('Processing...') : `${t('Place Order')} • ${formatPrice(finalTotal)}`}
                   </Button>
                 </form>
               </Form>
@@ -405,29 +438,82 @@ const CheckoutPage = () => {
                   ))}
                 </div>
                 
+                {/* Discount Code Input */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Tag size={16} className="text-red-500" />
+                    <Label htmlFor="discount-code" className="text-sm font-medium">
+                      {discountCodeTranslations[language].discount_code}
+                    </Label>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Input
+                      id="discount-code"
+                      value={discountCode}
+                      onChange={(e) => setDiscountCode(e.target.value)}
+                      placeholder="80off"
+                      disabled={appliedDiscount !== null}
+                      className="flex-grow"
+                    />
+                    {appliedDiscount === null ? (
+                      <Button 
+                        type="button" 
+                        onClick={applyDiscountCode} 
+                        disabled={!discountCode}
+                        className="bg-red-500 hover:bg-red-600 text-white"
+                      >
+                        {discountCodeTranslations[language].apply}
+                      </Button>
+                    ) : (
+                      <Button 
+                        type="button" 
+                        onClick={removeDiscount}
+                        variant="outline"
+                      >
+                        ✕
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {appliedDiscount !== null && (
+                    <p className="text-sm text-green-600 mt-1">
+                      {discountCodeTranslations[language].discount_applied}: {appliedDiscount}%
+                    </p>
+                  )}
+                </div>
+                
                 <Separator className="my-4" />
                 
                 {/* Totals */}
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('Subtotal')}</span>
-                    <span>{formatPrice(getTotalPrice())}</span>
+                    <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('Shipping')}</span>
-                    <span>{formatPrice(getTotalPrice() > 10000 ? 0 : 1000)}</span>
+                    <span>{t('Free')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('Tax')}</span>
-                    <span>{formatPrice(Math.round(getTotalPrice() * 0.1))}</span>
+                    <span>{formatPrice(taxAmount)}</span>
                   </div>
+                  
+                  {/* Show discount if applied */}
+                  {appliedDiscount !== null && (
+                    <div className="flex justify-between text-red-500">
+                      <span>{t('Discount')} ({appliedDiscount}%)</span>
+                      <span>-{formatPrice(discountAmount)}</span>
+                    </div>
+                  )}
                 </div>
                 
                 <Separator className="my-4" />
                 
                 <div className="flex justify-between text-lg font-medium">
                   <span>{t('Total')}</span>
-                  <span>{formatPrice(getTotalPrice() + (getTotalPrice() > 10000 ? 0 : 1000) + Math.round(getTotalPrice() * 0.1))}</span>
+                  <span>{formatPrice(finalTotal)}</span>
                 </div>
               </div>
             </div>

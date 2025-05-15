@@ -13,6 +13,10 @@ export function formatPrice(price: number): string {
   }).format(price)
 }
 
+export function calculateDiscountedPrice(originalPrice: number, discountPercentage: number): number {
+  return originalPrice - (originalPrice * (discountPercentage / 100));
+}
+
 export function capitalizeFirstLetter(string: string): string {
   return string.charAt(0).toUpperCase() + string.slice(1)
 }
@@ -77,4 +81,34 @@ export const discountTranslations = {
     special_sale: "عرض خاص",
     discount_desc: "احصل على خصم {{percent}} على منتجات مختارة",
   }
+};
+
+// Discount code translations
+export const discountCodeTranslations = {
+  en: {
+    discount_code: "Discount Code",
+    apply: "Apply",
+    discount_applied: "Discount Applied",
+    invalid_code: "Invalid discount code",
+    discount_removed: "Discount removed",
+  },
+  fr: {
+    discount_code: "Code de Réduction",
+    apply: "Appliquer",
+    discount_applied: "Réduction Appliquée",
+    invalid_code: "Code de réduction invalide",
+    discount_removed: "Réduction supprimée",
+  },
+  ar: {
+    discount_code: "رمز الخصم",
+    apply: "تطبيق",
+    discount_applied: "تم تطبيق الخصم",
+    invalid_code: "رمز الخصم غير صالح",
+    discount_removed: "تم إزالة الخصم",
+  }
+};
+
+// Valid discount codes
+export const VALID_DISCOUNT_CODES = {
+  "80off": 80
 };
