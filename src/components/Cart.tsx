@@ -3,10 +3,13 @@ import { useCart } from "@/hooks/useCart";
 import CartItem from "./CartItem";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Truck } from "lucide-react";
+import { AlertCircle, ShoppingBag, Truck } from "lucide-react";
 import { formatPrice, FREE_SHIPPING_THRESHOLD, isEligibleForFreeShipping, shippingTranslations } from "@/lib/utils";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Progress } from "./ui/progress";
+
+// Define the minimum order value
+const MINIMUM_ORDER_VALUE = 249;
 
 const Cart = () => {
   const { items, getTotalItems, getTotalPrice, clearCart } = useCart();
@@ -16,6 +19,10 @@ const Cart = () => {
   const freeShippingEligible = isEligibleForFreeShipping(subtotal);
   const amountToFreeShipping = FREE_SHIPPING_THRESHOLD - subtotal;
   const freeShippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
+  
+  // Check if order meets minimum value
+  const isBelowMinimum = subtotal < MINIMUM_ORDER_VALUE;
+  const amountToMinimum = MINIMUM_ORDER_VALUE - subtotal;
   
   if (items.length === 0) {
     return (
@@ -64,8 +71,26 @@ const Cart = () => {
       </div>
       
       <div className="border-t pt-4 mt-auto">
+        {/* Minimum order warning */}
+        {isBelowMinimum && (
+          <div className="mb-4 p-3 bg-red-50 rounded-md">
+            <div className="flex items-start gap-2 mb-2">
+              <AlertCircle className="text-red-500 h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-red-800">
+                  {t('Minimum order value:')} {formatPrice(MINIMUM_ORDER_VALUE)}
+                </p>
+                <p className="text-xs text-red-700">
+                  {t('Add')} {formatPrice(amountToMinimum)} {t('more to place an order')}
+                </p>
+              </div>
+            </div>
+            <Progress value={(subtotal / MINIMUM_ORDER_VALUE) * 100} className="h-1.5" />
+          </div>
+        )}
+        
         {/* Free shipping progress */}
-        {!freeShippingEligible && (
+        {!freeShippingEligible && !isBelowMinimum && (
           <div className="mb-4 p-3 bg-gray-50 rounded-md">
             <div className="flex items-center gap-2 mb-2">
               <Truck className="text-amber-500 h-4 w-4" />
@@ -103,9 +128,15 @@ const Cart = () => {
           <span>{formatPrice(getTotalPrice())}</span>
         </div>
         
-        <Button asChild className="w-full bg-evermore-dark hover:bg-black text-white">
+        <Button 
+          asChild 
+          className="w-full bg-evermore-dark hover:bg-black text-white"
+          disabled={isBelowMinimum}
+        >
           <Link to="/checkout">
-            {t('checkout')}
+            {isBelowMinimum 
+              ? `${t('Minimum')} ${formatPrice(MINIMUM_ORDER_VALUE)} ${t('Required')}`
+              : t('checkout')}
           </Link>
         </Button>
       </div>

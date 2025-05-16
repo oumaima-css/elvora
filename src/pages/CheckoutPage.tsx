@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -22,6 +23,10 @@ import { Form } from '@/components/ui/form';
 import CustomerInfoForm, { CheckoutFormValues } from '@/components/checkout/CustomerInfoForm';
 import PaymentMethodSection from '@/components/checkout/PaymentMethodSection';
 import OrderSummary from '@/components/checkout/OrderSummary';
+import { AlertCircle } from 'lucide-react';
+
+// Define the minimum order value
+const MINIMUM_ORDER_VALUE = 249;
 
 const CheckoutPage = () => {
   const { items, getTotalPrice, clearCart } = useCart();
@@ -68,6 +73,14 @@ const CheckoutPage = () => {
   };
   
   const onSubmit = async (data: CheckoutFormValues) => {
+    const subtotal = getTotalPrice();
+    
+    // Check if order meets minimum value requirement
+    if (subtotal < MINIMUM_ORDER_VALUE) {
+      toast.error(t('Minimum order value is') + ' ' + formatPrice(MINIMUM_ORDER_VALUE));
+      return;
+    }
+    
     setIsProcessing(true);
     
     try {
@@ -75,7 +88,6 @@ const CheckoutPage = () => {
       const orderId = await processPayment();
       
       // Calculate the final amount with discount and shipping
-      const subtotal = getTotalPrice();
       const isShippingFree = isEligibleForFreeShipping(subtotal);
       const shippingCost = isShippingFree ? 0 : SHIPPING_FEE;
       
@@ -134,6 +146,9 @@ const CheckoutPage = () => {
   const discountAmount = appliedDiscount ? (subtotal * appliedDiscount / 100) : 0;
   const finalTotal = subtotal - discountAmount + shippingCost;
   
+  // Check if order meets minimum value
+  const isBelowMinimum = subtotal < MINIMUM_ORDER_VALUE;
+  
   const { language } = useLanguage();
   
   if (items.length === 0) {
@@ -160,6 +175,19 @@ const CheckoutPage = () => {
         <div className="luxury-container py-8">
           <h1 className="text-3xl font-serif font-medium mb-8">{t('Checkout')}</h1>
           
+          {/* Minimum order warning */}
+          {isBelowMinimum && (
+            <div className="mb-6 p-4 border border-red-300 bg-red-50 rounded-md flex items-start">
+              <AlertCircle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-medium text-red-800">{t('Minimum Order Value Required')}</h3>
+                <p className="text-red-700">
+                  {t('Orders must be at least')} {formatPrice(MINIMUM_ORDER_VALUE)}. {t('Your current subtotal is')} {formatPrice(subtotal)}.
+                </p>
+              </div>
+            </div>
+          )}
+          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="lg:col-span-2">
@@ -173,9 +201,13 @@ const CheckoutPage = () => {
                 <Button 
                   type="submit" 
                   className="w-full bg-gold hover:bg-gold-dark text-white h-12 text-lg"
-                  disabled={isProcessing}
+                  disabled={isProcessing || isBelowMinimum}
                 >
-                  {isProcessing ? t('Processing...') : `${t('Place Order')} • ${formatPrice(finalTotal)}`}
+                  {isProcessing 
+                    ? t('Processing...') 
+                    : isBelowMinimum 
+                      ? `${t('Minimum')} ${formatPrice(MINIMUM_ORDER_VALUE)} ${t('Required')}`
+                      : `${t('Place Order')} • ${formatPrice(finalTotal)}`}
                 </Button>
               </form>
             </Form>
