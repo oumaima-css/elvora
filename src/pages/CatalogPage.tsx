@@ -177,7 +177,7 @@ const CatalogPage = () => {
                   {discountTranslations[language].special_sale}
                 </h2>
                 <p className="text-lg">
-                  {discountTranslations[language].discount_desc.replace('{{percent}}', '80%')}
+                  {discountTranslations[language].discount_desc}
                 </p>
               </div>
             </div>
