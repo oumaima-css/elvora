@@ -139,3 +139,6 @@ export const shippingTranslations = {
 export const VALID_DISCOUNT_CODES = {
   "80off": 80
 };
+
+// Export Truck icon component for reuse
+export { Truck } from "lucide-react";
