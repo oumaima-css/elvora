@@ -1,3 +1,4 @@
+
 import { Product } from '@/data/products';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { toast } from 'sonner';
@@ -18,6 +19,7 @@ interface CartContextType {
   getTotalItems: () => number;
   getTotalPrice: () => number;
   isInCart: (productId: string) => boolean;
+  getQuantityInCart: (productId: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -105,6 +107,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return items.some(item => item.product.id === productId);
   };
 
+  const getQuantityInCart = (productId: string) => {
+    const item = items.find(item => item.product.id === productId);
+    return item ? item.quantity : 0;
+  };
+
   return (
     <CartContext.Provider value={{
       items,
@@ -114,7 +121,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       clearCart,
       getTotalItems,
       getTotalPrice,
-      isInCart
+      isInCart,
+      getQuantityInCart
     }}>
       {children}
     </CartContext.Provider>

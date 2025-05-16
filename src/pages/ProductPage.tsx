@@ -19,7 +19,7 @@ const ProductPage = () => {
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
-  const { addItem, isInCart } = useCart();
+  const { addItem, getQuantityInCart } = useCart();
   
   useEffect(() => {
     if (id) {
@@ -55,6 +55,8 @@ const ProductPage = () => {
       addItem(product, quantity, selectedColor, selectedSize);
     }
   };
+
+  const quantityInCart = product ? getQuantityInCart(product.id) : 0;
   
   if (!product) {
     return (
@@ -188,21 +190,24 @@ const ProductPage = () => {
                 </div>
               </div>
               
-              {/* Add to Cart Button */}
-              <Button 
-                className="w-full bg-evermore-dark hover:bg-black text-white h-12 flex items-center gap-2"
-                onClick={handleAddToCart}
-                disabled={isInCart(product.id)}
-              >
-                {isInCart(product.id) ? (
-                  'Added to Cart'
-                ) : (
-                  <>
-                    <ShoppingBag className="h-5 w-5" />
-                    Add to Cart
-                  </>
+              {/* Add to Cart Button with quantity badge */}
+              <div className="relative w-full">
+                <Button 
+                  className="w-full bg-evermore-dark hover:bg-black text-white h-12 flex items-center gap-2"
+                  onClick={handleAddToCart}
+                  disabled={product.stock <= 0}
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  Add to Cart
+                </Button>
+                
+                {/* Quantity in cart badge */}
+                {quantityInCart > 0 && (
+                  <div className="absolute -top-2 -right-2 bg-gold text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                    {quantityInCart}
+                  </div>
                 )}
-              </Button>
+              </div>
               
               {/* Additional Info */}
               <Tabs defaultValue="details" className="mt-12">

@@ -12,7 +12,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { addItem, isInCart } = useCart();
+  const { addItem, isInCart, getQuantityInCart } = useCart();
+  const quantityInCart = getQuantityInCart(product.id);
   
   return (
     <Card className="overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-lg group">
@@ -55,26 +56,29 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </Link>
       
       <CardFooter className="p-4 pt-0">
-        <Button 
-          className="w-full bg-evermore-dark hover:bg-black text-white flex items-center gap-2"
-          onClick={(e) => {
-            e.preventDefault();
-            addItem(product);
-          }}
-          disabled={isInCart(product.id) || product.stock <= 0}
-        >
-          {isInCart(product.id) 
-            ? 'In Cart' 
-            : product.stock <= 0 
+        <div className="w-full relative">
+          <Button 
+            className="w-full bg-evermore-dark hover:bg-black text-white flex items-center gap-2"
+            onClick={(e) => {
+              e.preventDefault();
+              addItem(product);
+            }}
+            disabled={product.stock <= 0}
+          >
+            <ShoppingBag size={16} />
+            {product.stock <= 0 
               ? 'Out of Stock' 
-              : (
-                <>
-                  <ShoppingBag size={16} />
-                  Add to Cart
-                </>
-              )
-          }
-        </Button>
+              : 'Add to Cart'
+            }
+          </Button>
+          
+          {/* Quantity Badge */}
+          {quantityInCart > 0 && (
+            <div className="absolute -top-2 -right-2 bg-gold text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+              {quantityInCart}
+            </div>
+          )}
+        </div>
       </CardFooter>
     </Card>
   );
