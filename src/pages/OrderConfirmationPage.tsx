@@ -4,9 +4,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, MapPin, Phone, User, Mail, Tag } from 'lucide-react';
+import { CheckCircle, MapPin, Phone, User, Mail, Tag, Truck } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, isEligibleForFreeShipping, shippingTranslations } from '@/lib/utils';
 
 interface CustomerInfo {
   fullName: string;
@@ -23,6 +23,8 @@ interface OrderDetails {
   orderId: string;
   date: string;
   status: string;
+  subtotal?: number;
+  shipping?: number;
   total?: number;
   originalTotal?: number;
   discountPercent?: number;
@@ -33,7 +35,7 @@ interface OrderDetails {
 const OrderConfirmationPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [orderDetails, setOrderDetails] = useState<OrderDetails>({
     orderId: 'unknown',
     date: new Date().toLocaleDateString(),
@@ -47,6 +49,8 @@ const OrderConfirmationPage = () => {
         orderId: location.state.orderId,
         date: new Date().toLocaleDateString(),
         status: 'Paid',
+        subtotal: location.state.subtotal,
+        shipping: location.state.shipping,
         total: location.state.total,
         originalTotal: location.state.originalTotal,
         discountPercent: location.state.discountPercent,
@@ -107,7 +111,12 @@ const OrderConfirmationPage = () => {
                 
                 <div className="mb-2">
                   <span className="text-muted-foreground">{t('Shipping Method')}:</span>
-                  <p className="font-medium">{t('Standard Shipping')} ({t('Free')})</p>
+                  <p className="font-medium">
+                    {t('Standard Shipping')} 
+                    {orderDetails.subtotal && isEligibleForFreeShipping(orderDetails.subtotal) 
+                      ? ` (${shippingTranslations[language].free_shipping})` 
+                      : orderDetails.shipping ? ` (${formatPrice(orderDetails.shipping)})` : ''}
+                  </p>
                 </div>
                 
                 <div className="mb-2">
@@ -169,21 +178,47 @@ const OrderConfirmationPage = () => {
             )}
             
             <div className="mt-6 pt-6 border-t">
-              {/* Display discount information if applicable */}
-              {orderDetails.discountPercent && orderDetails.originalTotal && (
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center text-red-500">
-                    <Tag className="mr-2 h-4 w-4" />
-                    <span>{t('Discount Applied')}: {orderDetails.discountPercent}%</span>
+              {/* Order Summary */}
+              <div className="mb-4">
+                {orderDetails.subtotal && (
+                  <div className="flex justify-between mb-2">
+                    <span className="text-muted-foreground">{t('Subtotal')}</span>
+                    <span>{formatPrice(orderDetails.subtotal)}</span>
                   </div>
-                  <div className="text-right">
-                    <div className="text-muted-foreground line-through">{formatPrice(orderDetails.originalTotal)}</div>
-                    <p className="text-red-500">-{formatPrice(orderDetails.originalTotal * orderDetails.discountPercent / 100)}</p>
+                )}
+                
+                {/* Shipping Cost */}
+                {orderDetails.subtotal && (
+                  <div className="flex justify-between mb-2">
+                    <div className="flex items-center">
+                      <Truck className="mr-2 h-4 w-4" />
+                      <span className="text-muted-foreground">{shippingTranslations[language].shipping_fee}</span>
+                    </div>
+                    <span>
+                      {isEligibleForFreeShipping(orderDetails.subtotal)
+                        ? shippingTranslations[language].free_shipping
+                        : formatPrice(orderDetails.shipping || 0)
+                      }
+                    </span>
                   </div>
-                </div>
-              )}
+                )}
+                
+                {/* Display discount information if applicable */}
+                {orderDetails.discountPercent && orderDetails.originalTotal && (
+                  <div className="flex justify-between mb-2">
+                    <div className="flex items-center text-red-500">
+                      <Tag className="mr-2 h-4 w-4" />
+                      <span>{t('Discount Applied')}: {orderDetails.discountPercent}%</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-muted-foreground line-through">{formatPrice(orderDetails.originalTotal)}</div>
+                      <p className="text-red-500">-{formatPrice(orderDetails.originalTotal * orderDetails.discountPercent / 100)}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
               
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mt-2">
                 <span className="font-medium">{t('Order Total')}:</span>
                 <span className="font-medium text-xl">
                   {orderDetails.total ? formatPrice(orderDetails.total) : t('Paid')}

@@ -3,13 +3,19 @@ import { useCart } from "@/hooks/useCart";
 import CartItem from "./CartItem";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ShoppingBag } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { ShoppingBag, Truck } from "lucide-react";
+import { formatPrice, FREE_SHIPPING_THRESHOLD, isEligibleForFreeShipping, shippingTranslations } from "@/lib/utils";
 import { useLanguage } from "@/hooks/useLanguage";
+import { Progress } from "./ui/progress";
 
 const Cart = () => {
   const { items, getTotalItems, getTotalPrice, clearCart } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  
+  const subtotal = getTotalPrice();
+  const freeShippingEligible = isEligibleForFreeShipping(subtotal);
+  const amountToFreeShipping = FREE_SHIPPING_THRESHOLD - subtotal;
+  const freeShippingProgress = Math.min(100, (subtotal / FREE_SHIPPING_THRESHOLD) * 100);
   
   if (items.length === 0) {
     return (
@@ -58,13 +64,39 @@ const Cart = () => {
       </div>
       
       <div className="border-t pt-4 mt-auto">
+        {/* Free shipping progress */}
+        {!freeShippingEligible && (
+          <div className="mb-4 p-3 bg-gray-50 rounded-md">
+            <div className="flex items-center gap-2 mb-2">
+              <Truck className="text-amber-500 h-4 w-4" />
+              <p className="text-sm">
+                {t('Add')} {formatPrice(amountToFreeShipping)} {t('more for free shipping')}
+              </p>
+            </div>
+            <Progress value={freeShippingProgress} className="h-1.5" />
+          </div>
+        )}
+        
+        {freeShippingEligible && (
+          <div className="mb-4 p-3 bg-green-50 rounded-md">
+            <div className="flex items-center gap-2">
+              <Truck className="text-green-500 h-4 w-4" />
+              <p className="text-sm text-green-600">{t('You qualify for free shipping!')}</p>
+            </div>
+          </div>
+        )}
+        
         <div className="flex justify-between mb-2">
           <span className="text-muted-foreground">{t('subtotal')}</span>
           <span className="font-medium">{formatPrice(getTotalPrice())}</span>
         </div>
         <div className="flex justify-between mb-4">
           <span className="text-muted-foreground">{t('shipping')}</span>
-          <span>{t('free')}</span>
+          <span>
+            {freeShippingEligible 
+              ? shippingTranslations[language].free_shipping
+              : t('To be calculated')}
+          </span>
         </div>
         <div className="flex justify-between text-lg font-medium mb-6">
           <span>{t('total')}</span>

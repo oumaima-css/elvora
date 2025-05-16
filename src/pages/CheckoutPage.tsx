@@ -8,9 +8,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatPrice, calculateDiscountedPrice, VALID_DISCOUNT_CODES, discountCodeTranslations } from '@/lib/utils';
+import { 
+  formatPrice, 
+  calculateDiscountedPrice, 
+  VALID_DISCOUNT_CODES, 
+  discountCodeTranslations,
+  FREE_SHIPPING_THRESHOLD,
+  SHIPPING_FEE,
+  isEligibleForFreeShipping,
+  shippingTranslations
+} from '@/lib/utils';
 import { toast } from 'sonner';
-import { CreditCard, CreditCardIcon, Wallet, User, Phone, MapPin, Building, Flag, Tag } from 'lucide-react';
+import { CreditCard, CreditCardIcon, Wallet, User, Phone, MapPin, Building, Flag, Tag, Truck } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -73,11 +82,16 @@ const CheckoutPage = () => {
       // Process the payment (this would be replaced with Stripe)
       const orderId = await processPayment();
       
-      // Calculate the final amount with discount
+      // Calculate the final amount with discount and shipping
       const subtotal = getTotalPrice();
-      const total = appliedDiscount !== null 
+      const isShippingFree = isEligibleForFreeShipping(subtotal);
+      const shippingCost = isShippingFree ? 0 : SHIPPING_FEE;
+      
+      const discountedSubtotal = appliedDiscount !== null 
         ? calculateDiscountedPrice(subtotal, appliedDiscount) 
         : subtotal;
+        
+      const total = discountedSubtotal + shippingCost;
       
       // Clear the cart and redirect to confirmation page with all order details
       clearCart();
@@ -85,6 +99,8 @@ const CheckoutPage = () => {
         state: { 
           orderId,
           customerInfo: data,
+          subtotal: subtotal,
+          shipping: shippingCost,
           total: total,
           originalTotal: subtotal,
           discountPercent: appliedDiscount,
@@ -121,9 +137,11 @@ const CheckoutPage = () => {
   
   // Calculate the final price
   const subtotal = getTotalPrice();
+  const isShippingFree = isEligibleForFreeShipping(subtotal);
+  const shippingCost = isShippingFree ? 0 : SHIPPING_FEE;
   const taxAmount = Math.round(subtotal * 0.1);
   const discountAmount = appliedDiscount ? (subtotal * appliedDiscount / 100) : 0;
-  const finalTotal = subtotal + taxAmount - discountAmount;
+  const finalTotal = subtotal + taxAmount + shippingCost - discountAmount;
   
   if (items.length === 0) {
     return (
@@ -150,7 +168,7 @@ const CheckoutPage = () => {
           <h1 className="text-3xl font-serif font-medium mb-8">{t('Checkout')}</h1>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Order Form */}
+            {/* Customer Information */}
             <div className="lg:col-span-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -438,6 +456,16 @@ const CheckoutPage = () => {
                   ))}
                 </div>
                 
+                {/* Shipping Notice */}
+                <div className="mb-4">
+                  <div className="flex items-center gap-2">
+                    <Truck size={16} className={isShippingFree ? "text-green-500" : "text-amber-500"} />
+                    <p className="text-sm text-muted-foreground">
+                      {shippingTranslations[language].free_shipping_message}
+                    </p>
+                  </div>
+                </div>
+                
                 {/* Discount Code Input */}
                 <div className="mb-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -492,8 +520,13 @@ const CheckoutPage = () => {
                     <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">{t('Shipping')}</span>
-                    <span>{t('Free')}</span>
+                    <span className="text-muted-foreground">{shippingTranslations[language].shipping_fee}</span>
+                    <span>
+                      {isShippingFree 
+                        ? shippingTranslations[language].free_shipping
+                        : formatPrice(shippingCost)
+                      }
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">{t('Tax')}</span>

@@ -42,6 +42,14 @@ export function getRandomSubset<T>(array: T[], size: number): T[] {
   return shuffled.slice(0, size)
 }
 
+// Shipping constants
+export const FREE_SHIPPING_THRESHOLD = 999;
+export const SHIPPING_FEE = 50;
+
+export function isEligibleForFreeShipping(subtotal: number): boolean {
+  return subtotal >= FREE_SHIPPING_THRESHOLD;
+}
+
 // Languages supported by the application
 export type SupportedLanguage = 'en' | 'fr' | 'ar';
 
@@ -105,6 +113,25 @@ export const discountCodeTranslations = {
     discount_applied: "تم تطبيق الخصم",
     invalid_code: "رمز الخصم غير صالح",
     discount_removed: "تم إزالة الخصم",
+  }
+};
+
+// Shipping translations
+export const shippingTranslations = {
+  en: {
+    free_shipping: "Free",
+    shipping_fee: "Shipping Fee",
+    free_shipping_message: "Free shipping on orders over 999 MAD"
+  },
+  fr: {
+    free_shipping: "Gratuit",
+    shipping_fee: "Frais de livraison",
+    free_shipping_message: "Livraison gratuite pour les commandes de plus de 999 MAD"
+  },
+  ar: {
+    free_shipping: "مجاناً",
+    shipping_fee: "رسوم الشحن",
+    free_shipping_message: "شحن مجاني للطلبات التي تزيد عن 999 درهم"
   }
 };
 
