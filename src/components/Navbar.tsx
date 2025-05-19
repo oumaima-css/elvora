@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
 import { ShoppingBag, Menu, X } from 'lucide-react';
 import Cart from './Cart';
+import LanguageSelector from './LanguageSelector';
 
 const Navbar = () => {
   const { getTotalItems } = useCart();
@@ -50,8 +51,11 @@ const Navbar = () => {
           </Link>
         </nav>
 
-        {/* Cart & Mobile Menu */}
-        <div className="flex items-center space-x-4">
+        {/* Cart, Language Selector & Mobile Menu */}
+        <div className="flex items-center space-x-2">
+          {/* Language Selector */}
+          <LanguageSelector />
+
           {/* Cart */}
           <Sheet>
             <SheetTrigger asChild>
