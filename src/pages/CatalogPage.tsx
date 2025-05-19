@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -15,7 +16,7 @@ import {
   Gender,
   ProductCategory
 } from '@/data/products';
-import { capitalizeFirstLetter, discountTranslations } from '@/lib/utils';
+import { capitalizeFirstLetter } from '@/lib/utils';
 import { Filter, Percent, Users, X } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
 
@@ -173,10 +174,10 @@ const CatalogPage = () => {
               </div>
               <div className="text-center">
                 <h2 className="text-2xl font-serif font-bold">
-                  {discountTranslations[language].special_sale}
+                  {t('special_sale')}
                 </h2>
                 <p className="text-lg">
-                  {discountTranslations[language].discount_desc}
+                  {t('discount_desc')}
                 </p>
               </div>
             </div>
