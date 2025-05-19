@@ -1,24 +1,25 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductGrid from '@/components/ProductGrid';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { 
   getProductsByGender, 
   getAllProducts,
   getProductsByCategory,
   getProductsByGenderAndCategory,
-  getCategoriesByGender,
   getCategoryDisplayName,
   Gender,
   ProductCategory
 } from '@/data/products';
 import { capitalizeFirstLetter } from '@/lib/utils';
-import { Filter, Percent, Users, X } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { useLanguage } from '@/hooks/useLanguage';
+import CatalogHero from '@/components/catalog/CatalogHero';
+import DiscountBanner from '@/components/catalog/DiscountBanner';
+import CategoryFilter from '@/components/catalog/CategoryFilter';
 
 // Define the specific categories for each gender
 const womenCategories: ProductCategory[] = [
@@ -39,9 +40,8 @@ const menCategories: ProductCategory[] = [
 
 const CatalogPage = () => {
   const { gender } = useParams<{ gender: string }>();
-  const location = useLocation();
   const navigate = useNavigate();
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   
   // Convert the gender param to a valid Gender type or set to "all"
   const currentGender = gender as Gender | undefined;
@@ -120,69 +120,13 @@ const CatalogPage = () => {
       
       <main className="flex-grow pt-24">
         {/* Hero Banner */}
-        <div className="relative bg-evermore-dark text-white py-16">
-          <div className="luxury-container text-center">
-            <h1 className="text-4xl md:text-5xl font-serif font-medium mb-4">
-              {selectedGender === "men" 
-                ? t("mens_collection") 
-                : selectedGender === "women" 
-                  ? t("womens_collection") 
-                  : t("all_collections")}
-            </h1>
-            <p className="text-lg text-white/80 max-w-2xl mx-auto">
-              {selectedGender === "men"
-                ? t("mens_collection_desc")
-                : selectedGender === "women"
-                ? t("womens_collection_desc")
-                : t("all_collections_desc")}
-            </p>
-            
-            {/* Gender selection tabs */}
-            <div className="mt-8 flex justify-center gap-4">
-              <Button 
-                variant={selectedGender === "all" ? "default" : "outline"}
-                onClick={() => switchGender("all")}
-                className="px-8"
-              >
-                <Users className="mr-2 h-4 w-4" />
-                {t("all")}
-              </Button>
-              <Button 
-                variant={selectedGender === "men" ? "default" : "outline"}
-                onClick={() => switchGender("men")}
-                className="px-8"
-              >
-                {t("men")}
-              </Button>
-              <Button 
-                variant={selectedGender === "women" ? "default" : "outline"}
-                onClick={() => switchGender("women")}
-                className="px-8"
-              >
-                {t("women")}
-              </Button>
-            </div>
-          </div>
-        </div>
+        <CatalogHero 
+          selectedGender={selectedGender}
+          switchGender={switchGender}
+        />
         
-        {/* Discount Banner - NEW SECTION */}
-        <div className="bg-red-600 text-white py-6 animate-fade-in">
-          <div className="luxury-container">
-            <div className="flex items-center justify-center">
-              <div className="bg-white rounded-full p-2 mr-4">
-                <Percent className="h-6 w-6 text-red-600" />
-              </div>
-              <div className="text-center">
-                <h2 className="text-2xl font-serif font-bold">
-                  {t('special_sale')}
-                </h2>
-                <p className="text-lg">
-                  {t('discount_desc')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Discount Banner */}
+        <DiscountBanner />
         
         <div className="luxury-container py-8">
           <div className="flex flex-col md:flex-row gap-8">
@@ -203,34 +147,12 @@ const CatalogPage = () => {
             
             {/* Sidebar Filters */}
             <aside className={`w-full md:w-64 ${isMobileFilterOpen ? 'block' : 'hidden'} md:block`}>
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-medium">{t("categories")}</h2>
-                  {selectedCategory && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={clearFilters}
-                      className="text-xs"
-                    >
-                      {t("clear_all")}
-                    </Button>
-                  )}
-                </div>
-                <Separator className="mb-4" />
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <Button
-                      key={category}
-                      variant={selectedCategory === category ? "default" : "ghost"}
-                      className={`justify-start w-full ${selectedCategory === category ? 'bg-gold hover:bg-gold-dark' : ''}`}
-                      onClick={() => toggleCategory(category)}
-                    >
-                      {getCategoryDisplayName(category)}
-                    </Button>
-                  ))}
-                </div>
-              </div>
+              <CategoryFilter 
+                categories={categories}
+                selectedCategory={selectedCategory}
+                toggleCategory={toggleCategory}
+                clearFilters={clearFilters}
+              />
             </aside>
             
             {/* Product Grid */}

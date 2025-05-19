@@ -20,6 +20,16 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'filter_by_gender': 'Filter by Gender',
     'price_range': 'Price Range',
     'all': 'All',
+    'categories': 'Categories',
+    'filter_products': 'Filter Products',
+    'hide': 'Hide',
+    'show': 'Show',
+    'clear_all': 'Clear All',
+    'all_collections': 'All Collections',
+    'all_collections_desc': 'Explore our complete range of premium accessories for everyone.',
+    'all_gender_items': 'All {gender} Items',
+    'all_items': 'All Items',
+    'products': 'Products',
     'no_products_found': 'No products found',
     'try_adjusting_filters': 'Try adjusting your filters or check back later for new arrivals.',
     'no_products_match': 'No products match your filters',
@@ -28,6 +38,12 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'max': 'Max',
     'to': 'to',
     'apply': 'Apply',
+    
+    // Hero
+    'timeless_luxury': 'Timeless Luxury for Modern Life',
+    'discover_premium': 'Discover premium accessories that blend elegant design with everyday functionality.',
+    'shop_men': 'Shop Men',
+    'shop_women': 'Shop Women',
     
     // Auth
     'login': 'Login',
@@ -82,7 +98,11 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'select_country': 'Select a country',
     'select_city': 'Select a city',
     'select_state': 'Select a state/province',
-    'code': 'Code'
+    'code': 'Code',
+    
+    // Special sale
+    'special_sale': 'Special Sale',
+    'discount_desc': 'Get up to 30% OFF on selected items'
   },
   fr: {
     // Navigation
@@ -100,6 +120,16 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'filter_by_gender': 'Filtrer par genre',
     'price_range': 'Fourchette de prix',
     'all': 'Tous',
+    'categories': 'Catégories',
+    'filter_products': 'Filtrer les produits',
+    'hide': 'Masquer',
+    'show': 'Afficher',
+    'clear_all': 'Tout effacer',
+    'all_collections': 'Toutes les Collections',
+    'all_collections_desc': 'Explorez notre gamme complète d\'accessoires premium pour tous.',
+    'all_gender_items': 'Tous les articles {gender}',
+    'all_items': 'Tous les articles',
+    'products': 'Produits',
     'no_products_found': 'Aucun produit trouvé',
     'try_adjusting_filters': 'Essayez d\'ajuster vos filtres ou revenez plus tard pour les nouveautés.',
     'no_products_match': 'Aucun produit ne correspond à vos filtres',
@@ -108,6 +138,12 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'max': 'Max',
     'to': 'à',
     'apply': 'Appliquer',
+    
+    // Hero
+    'timeless_luxury': 'Luxe intemporel pour la vie moderne',
+    'discover_premium': 'Découvrez des accessoires premium qui allient design élégant et fonctionnalité quotidienne.',
+    'shop_men': 'Boutique Hommes',
+    'shop_women': 'Boutique Femmes',
     
     // Auth
     'login': 'Connexion',
@@ -162,7 +198,11 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'select_country': 'Sélectionnez un pays',
     'select_city': 'Sélectionnez une ville',
     'select_state': 'Sélectionnez un état/province',
-    'code': 'Code'
+    'code': 'Code',
+    
+    // Special sale
+    'special_sale': 'Vente Spéciale',
+    'discount_desc': 'Obtenez jusqu\'à 30% de réduction sur certains articles'
   },
   ar: {
     // Navigation
@@ -180,6 +220,16 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'filter_by_gender': 'تصفية حسب الجنس',
     'price_range': 'نطاق السعر',
     'all': 'الكل',
+    'categories': 'الفئات',
+    'filter_products': 'تصفية المنتجات',
+    'hide': 'إخفاء',
+    'show': 'عرض',
+    'clear_all': 'مسح الكل',
+    'all_collections': 'جميع المجموعات',
+    'all_collections_desc': 'استكشف مجموعتنا الكاملة من الاكسسوارات الفاخرة للجميع.',
+    'all_gender_items': 'جميع العناصر {gender}',
+    'all_items': 'جميع العناصر',
+    'products': 'منتجات',
     'no_products_found': 'لم يتم العثور على منتجات',
     'try_adjusting_filters': 'حاول ضبط المرشحات أو العودة لاحقًا للوصول إلى منتجات جديدة.',
     'no_products_match': 'لا توجد منتجات تطابق المرشحات الخاصة بك',
@@ -188,6 +238,12 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'max': 'الحد الأقصى',
     'to': 'إلى',
     'apply': 'تطبيق',
+    
+    // Hero
+    'timeless_luxury': 'فخامة خالدة للحياة العصرية',
+    'discover_premium': 'اكتشف اكسسوارات فاخرة تجمع بين التصميم الأنيق والوظائف اليومية.',
+    'shop_men': 'تسوق للرجال',
+    'shop_women': 'تسوق للنساء',
     
     // Auth
     'login': 'تسجيل الدخول',
@@ -242,7 +298,11 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     'select_country': 'اختر الدولة',
     'select_city': 'اختر المدينة',
     'select_state': 'اختر الولاية/المقاطعة',
-    'code': 'الرمز'
+    'code': 'الرمز',
+    
+    // Special sale
+    'special_sale': 'عرض خاص',
+    'discount_desc': 'احصل على خصم يصل إلى 30٪ على منتجات مختارة'
   }
 };
 
