@@ -162,7 +162,7 @@ const CatalogPage = () => {
                   {selectedCategory 
                     ? getCategoryDisplayName(selectedCategory) 
                     : selectedGender !== "all"
-                      ? t("all_gender_items", { gender: capitalizeFirstLetter(selectedGender) })
+                      ? t("all_gender_items").replace("{gender}", capitalizeFirstLetter(selectedGender))
                       : t("all_items")}
                 </h2>
                 <p className="text-sm text-muted-foreground">{products.length} {t("products")}</p>

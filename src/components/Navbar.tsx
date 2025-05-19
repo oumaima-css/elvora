@@ -7,11 +7,13 @@ import { useCart } from '@/hooks/useCart';
 import { ShoppingBag, Menu, X } from 'lucide-react';
 import Cart from './Cart';
 import LanguageSelector from './LanguageSelector';
+import { useLanguage } from '@/hooks/useLanguage';
 
 const Navbar = () => {
   const { getTotalItems } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,16 +40,16 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
           <Link to="/catalog/men" className="luxury-underline text-evermore-dark font-medium hover:text-gold-dark transition-colors">
-            Men
+            {t('men')}
           </Link>
           <Link to="/catalog/women" className="luxury-underline text-evermore-dark font-medium hover:text-gold-dark transition-colors">
-            Women
+            {t('women')}
           </Link>
           <Link to="/new-arrivals" className="luxury-underline text-evermore-dark font-medium hover:text-gold-dark transition-colors">
-            New Arrivals
+            {t('new_arrivals')}
           </Link>
           <Link to="/bestsellers" className="luxury-underline text-evermore-dark font-medium hover:text-gold-dark transition-colors">
-            Best Sellers
+            {t('bestsellers')}
           </Link>
         </nav>
 
@@ -94,28 +96,28 @@ const Navbar = () => {
               className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Men
+              {t('men')}
             </Link>
             <Link 
               to="/catalog/women" 
               className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Women
+              {t('women')}
             </Link>
             <Link 
               to="/new-arrivals" 
               className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              New Arrivals
+              {t('new_arrivals')}
             </Link>
             <Link 
               to="/bestsellers" 
               className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Best Sellers
+              {t('bestsellers')}
             </Link>
           </div>
         </div>
