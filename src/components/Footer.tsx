@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Column */}
           <div>
-            <h3 className="font-serif text-xl font-medium mb-4 text-white">EVERMORE</h3>
+            <h3 className="font-serif text-xl font-medium mb-4 text-white">ELVORA</h3>
             <p className="text-gray-300 mb-4">
               Timeless luxury accessories for the modern lifestyle. Quality craftsmanship that stands the test of time.
             </p>
@@ -70,7 +70,7 @@ const Footer = () => {
         
         <div className="border-t border-gray-700 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} EVERMORE. All rights reserved.</p>
+            <p className="text-gray-400 text-sm">&copy; {new Date().getFullYear()} ELVORA. All rights reserved.</p>
             <div className="mt-4 md:mt-0 flex space-x-6">
               <img src="/placeholder.svg" alt="Visa" className="h-8" />
               <img src="/placeholder.svg" alt="Mastercard" className="h-8" />

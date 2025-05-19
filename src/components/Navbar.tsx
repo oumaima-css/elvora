@@ -33,7 +33,7 @@ const Navbar = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center">
           <h1 className="font-serif font-bold text-2xl tracking-wider text-evermore-dark">
-            EVERMORE
+            ELVORA
           </h1>
         </Link>
 
