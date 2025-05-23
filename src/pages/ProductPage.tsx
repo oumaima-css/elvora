@@ -18,6 +18,7 @@ const ProductPage = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState<string | undefined>(undefined);
   const [selectedSize, setSelectedSize] = useState<string | undefined>(undefined);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const { addItem, getQuantityInCart } = useCart();
   
@@ -28,6 +29,7 @@ const ProductPage = () => {
         setProduct(foundProduct);
         setSelectedColor(foundProduct.colors ? foundProduct.colors[0] : undefined);
         setSelectedSize(foundProduct.sizes ? foundProduct.sizes[0] : undefined);
+        setSelectedImageIndex(0);
         
         // Get related products
         const related = getProductsByCategory(foundProduct.category)
@@ -37,6 +39,16 @@ const ProductPage = () => {
       }
     }
   }, [id]);
+
+  // Update selected image when color changes
+  useEffect(() => {
+    if (product && selectedColor) {
+      const colorImageIndex = product.images.findIndex(img => img.color === selectedColor);
+      if (colorImageIndex !== -1) {
+        setSelectedImageIndex(colorImageIndex);
+      }
+    }
+  }, [selectedColor, product]);
   
   const increaseQuantity = () => {
     if (product && quantity < product.stock) {
@@ -57,6 +69,8 @@ const ProductPage = () => {
   };
 
   const quantityInCart = product ? getQuantityInCart(product.id) : 0;
+
+  const currentImage = product?.images[selectedImageIndex] || product?.images[0];
   
   if (!product) {
     return (
@@ -95,13 +109,37 @@ const ProductPage = () => {
           
           {/* Product Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {/* Product Image */}
-            <div className="bg-gray-100 rounded-md overflow-hidden">
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-full h-auto object-contain aspect-square"
-              />
+            {/* Product Images */}
+            <div className="space-y-4">
+              {/* Main Image */}
+              <div className="bg-gray-100 rounded-md overflow-hidden">
+                <img
+                  src={currentImage?.url}
+                  alt={currentImage?.alt || product.name}
+                  className="w-full h-auto object-contain aspect-square"
+                />
+              </div>
+              
+              {/* Image Thumbnails */}
+              {product.images.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto">
+                  {product.images.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-md overflow-hidden border-2 transition-colors ${
+                        selectedImageIndex === index ? 'border-gold' : 'border-gray-300'
+                      }`}
+                    >
+                      <img
+                        src={image.url}
+                        alt={image.alt || `${product.name} view ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             
             {/* Product Info */}

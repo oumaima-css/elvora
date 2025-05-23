@@ -15,12 +15,18 @@ export type ProductCategory =
 
 export type Gender = 'men' | 'women';
 
+export interface ProductImage {
+  url: string;
+  color?: string;
+  alt?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
   description: string;
   price: number;
-  images: string[];
+  images: ProductImage[];
   gender: Gender;
   category: ProductCategory;
   featured?: boolean;
@@ -38,7 +44,11 @@ export const products: Product[] = [
     name: 'Executive Leather Portfolio',
     description: 'A sophisticated leather portfolio for the modern professional. Features multiple compartments and premium craftsmanship.',
     price: 129.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', color: 'Black', alt: 'Black Executive Portfolio' },
+      { url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=500', color: 'Brown', alt: 'Brown Executive Portfolio' },
+      { url: 'https://images.unsplash.com/photo-1491336477066-31156b5e4f35?w=500', color: 'Navy', alt: 'Navy Executive Portfolio' }
+    ],
     gender: 'men',
     category: 'portfolios',
     featured: true,
@@ -50,7 +60,11 @@ export const products: Product[] = [
     name: 'Chronograph Watch',
     description: 'Precision timekeeping with elegant design. Water-resistant up to 50m with premium stainless steel construction.',
     price: 349.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=500', color: 'Silver', alt: 'Silver Chronograph Watch' },
+      { url: 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500', color: 'Gold', alt: 'Gold Chronograph Watch' },
+      { url: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa?w=500', color: 'Black', alt: 'Black Chronograph Watch' }
+    ],
     gender: 'men',
     category: 'watches',
     bestSeller: true,
@@ -62,7 +76,11 @@ export const products: Product[] = [
     name: 'Italian Leather Belt',
     description: 'Handcrafted Italian leather belt with brushed metal buckle. Perfect for formal and business casual attire.',
     price: 89.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', color: 'Black', alt: 'Black Italian Leather Belt' },
+      { url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=500', color: 'Brown', alt: 'Brown Italian Leather Belt' },
+      { url: 'https://images.unsplash.com/photo-1491336477066-31156b5e4f35?w=500', color: 'Tan', alt: 'Tan Italian Leather Belt' }
+    ],
     gender: 'men',
     category: 'pants-belts',
     stock: 25,
@@ -74,7 +92,11 @@ export const products: Product[] = [
     name: 'Bifold Wallet',
     description: 'Slim profile bifold wallet made from genuine leather. Features multiple card slots and a secure money clip.',
     price: 79.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', color: 'Black', alt: 'Black Bifold Wallet' },
+      { url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=500', color: 'Brown', alt: 'Brown Bifold Wallet' },
+      { url: 'https://images.unsplash.com/photo-1491336477066-31156b5e4f35?w=500', color: 'Oxblood', alt: 'Oxblood Bifold Wallet' }
+    ],
     gender: 'men',
     category: 'leather-wallets',
     stock: 20,
@@ -85,7 +107,11 @@ export const products: Product[] = [
     name: 'Canvas Backpack',
     description: 'Durable canvas backpack with leather trim. Features laptop compartment and multiple organizational pockets.',
     price: 159.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', color: 'Black', alt: 'Black Canvas Backpack' },
+      { url: 'https://images.unsplash.com/photo-1491336477066-31156b5e4f35?w=500', color: 'Navy', alt: 'Navy Canvas Backpack' },
+      { url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=500', color: 'Olive', alt: 'Olive Canvas Backpack' }
+    ],
     gender: 'men',
     category: 'backpacks',
     new: true,
@@ -97,7 +123,11 @@ export const products: Product[] = [
     name: 'Executive Laptop Bag',
     description: 'Professional laptop bag with padded compartment for laptops up to 15". Includes document pockets and organizer.',
     price: 189.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', color: 'Black', alt: 'Black Executive Laptop Bag' },
+      { url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=500', color: 'Brown', alt: 'Brown Executive Laptop Bag' },
+      { url: '/placeholder.svg', alt: 'Executive Laptop Bag' }
+    ],
     gender: 'men',
     category: 'computer-bags',
     featured: true,
@@ -111,7 +141,11 @@ export const products: Product[] = [
     name: 'Designer Tote Bag',
     description: 'Elegant tote bag with custom hardware and premium materials. Spacious interior with secure zipper closure.',
     price: 249.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', color: 'Black', alt: 'Black Designer Tote Bag' },
+      { url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=500', color: 'Cream', alt: 'Cream Designer Tote Bag' },
+      { url: 'https://images.unsplash.com/photo-1491336477066-31156b5e4f35?w=500', color: 'Burgundy', alt: 'Burgundy Designer Tote Bag' }
+    ],
     gender: 'women',
     category: 'bags-purses',
     featured: true,
@@ -123,7 +157,11 @@ export const products: Product[] = [
     name: 'Premium Lipstick Set',
     description: 'Long-lasting, hydrating lipsticks in four complementary shades. Cruelty-free and made with natural ingredients.',
     price: 79.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500', color: 'Ruby', alt: 'Ruby Lipstick Set' },
+      { url: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500', color: 'Blush', alt: 'Blush Lipstick Set' },
+      { url: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500', color: 'Coral', alt: 'Coral Lipstick Set' }
+    ],
     gender: 'women',
     category: 'cosmetics',
     bestSeller: true,
@@ -135,7 +173,11 @@ export const products: Product[] = [
     name: 'Hydrating Facial Serum',
     description: 'Advanced hydration serum with hyaluronic acid and vitamin C. Brightens and nourishes all skin types.',
     price: 89.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1570554886111-e80fcca6a029?w=500', alt: 'Hydrating Facial Serum' },
+      { url: 'https://images.unsplash.com/photo-1556228578-dd6e842ccbeb?w=500', alt: 'Facial Serum Bottle' },
+      { url: 'https://images.unsplash.com/photo-1621303837174-89787a7d4729?w=500', alt: 'Serum Application' }
+    ],
     gender: 'women',
     category: 'beauty-skincare',
     new: true,
@@ -146,7 +188,11 @@ export const products: Product[] = [
     name: 'Gold Chain Necklace',
     description: 'Elegant 18K gold-plated chain necklace with adjustable length. Perfect for everyday wear or special occasions.',
     price: 129.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=500', alt: 'Gold Chain Necklace' },
+      { url: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500', alt: 'Necklace Detail' },
+      { url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500', alt: 'Wearing Gold Necklace' }
+    ],
     gender: 'women',
     category: 'jewelry',
     featured: true,
@@ -157,7 +203,11 @@ export const products: Product[] = [
     name: 'Clutch Purse',
     description: 'Sophisticated evening clutch with detachable chain strap. Features interior card slots and zipper pocket.',
     price: 119.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500', color: 'Black', alt: 'Black Clutch Purse' },
+      { url: 'https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=500', color: 'Gold', alt: 'Gold Clutch Purse' },
+      { url: 'https://images.unsplash.com/photo-1491336477066-31156b5e4f35?w=500', color: 'Silver', alt: 'Silver Clutch Purse' }
+    ],
     gender: 'women',
     category: 'bags-purses',
     stock: 12,
@@ -168,7 +218,11 @@ export const products: Product[] = [
     name: 'Pearl Earrings',
     description: 'Classic freshwater pearl earrings with sterling silver posts. Timeless elegance for any occasion.',
     price: 99.99,
-    images: ['/placeholder.svg'],
+    images: [
+      { url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=500', alt: 'Pearl Earrings' },
+      { url: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500', alt: 'Earrings Detail' },
+      { url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=500', alt: 'Wearing Pearl Earrings' }
+    ],
     gender: 'women',
     category: 'jewelry',
     bestSeller: true,
