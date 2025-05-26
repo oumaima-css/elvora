@@ -51,7 +51,7 @@ const CatalogPage = () => {
       : "all"
   );
   
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(getAllProducts()); // Initialize with all products
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | null>(null);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -67,30 +67,44 @@ const CatalogPage = () => {
   
   // Update products and categories based on gender and category selection
   useEffect(() => {
+    console.log('Updating products for gender:', selectedGender, 'category:', selectedCategory);
+    
     if (selectedGender === "all") {
       // Get all products when "all" is selected
       if (selectedCategory) {
-        setProducts(getProductsByCategory(selectedCategory));
+        const filteredProducts = getProductsByCategory(selectedCategory);
+        console.log('Filtered products by category:', filteredProducts.length);
+        setProducts(filteredProducts);
       } else {
-        setProducts(getAllProducts());
+        const allProducts = getAllProducts();
+        console.log('All products:', allProducts.length);
+        setProducts(allProducts);
       }
       // For "all", we want to show both men's and women's categories
       setCategories([...menCategories, ...womenCategories]);
     } else if (selectedGender === "women") {
       // Get women-specific products and categories
       if (selectedCategory) {
-        setProducts(getProductsByGenderAndCategory(selectedGender, selectedCategory));
+        const filteredProducts = getProductsByGenderAndCategory(selectedGender, selectedCategory);
+        console.log('Women products by category:', filteredProducts.length);
+        setProducts(filteredProducts);
       } else {
-        setProducts(getProductsByGender(selectedGender));
+        const womenProducts = getProductsByGender(selectedGender);
+        console.log('All women products:', womenProducts.length);
+        setProducts(womenProducts);
       }
       // Only show women's categories
       setCategories(womenCategories);
     } else {
       // Get men-specific products and categories
       if (selectedCategory) {
-        setProducts(getProductsByGenderAndCategory(selectedGender, selectedCategory));
+        const filteredProducts = getProductsByGenderAndCategory(selectedGender, selectedCategory);
+        console.log('Men products by category:', filteredProducts.length);
+        setProducts(filteredProducts);
       } else {
-        setProducts(getProductsByGender(selectedGender));
+        const menProducts = getProductsByGender(selectedGender);
+        console.log('All men products:', menProducts.length);
+        setProducts(menProducts);
       }
       // Only show men's categories
       setCategories(menCategories);
@@ -110,6 +124,7 @@ const CatalogPage = () => {
   };
   
   const switchGender = (gender: Gender | "all") => {
+    console.log('Switching gender to:', gender);
     setSelectedGender(gender);
     setSelectedCategory(null); // Reset category when switching gender
   };
