@@ -10,9 +10,12 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/hooks/useLanguage';
 
 const Cart = () => {
-  const { items, total, itemCount, clearCart } = useCart();
+  const { items, getTotal, getTotalItems, clearCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
+
+  const total = getTotal();
+  const itemCount = getTotalItems();
 
   const handleCheckout = () => {
     setIsOpen(false);
@@ -64,8 +67,7 @@ const Cart = () => {
                 {items.map((item) => (
                   <CartItem 
                     key={`${item.product.id}-${item.selectedColor || 'default'}`} 
-                    item={item}
-                    imageUrl={item.product.images[0].url}
+                    {...item}
                   />
                 ))}
               </div>

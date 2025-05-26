@@ -45,6 +45,9 @@ const Navbar = () => {
           <Link to="/catalog/women" className="luxury-underline text-evermore-dark font-medium hover:text-gold-dark transition-colors">
             {t('women')}
           </Link>
+          <Link to="/catalog" className="luxury-underline text-evermore-dark font-medium hover:text-gold-dark transition-colors">
+            {t('all')}
+          </Link>
           <Link to="/new-arrivals" className="luxury-underline text-evermore-dark font-medium hover:text-gold-dark transition-colors">
             {t('new_arrivals')}
           </Link>
@@ -104,6 +107,13 @@ const Navbar = () => {
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {t('women')}
+            </Link>
+            <Link 
+              to="/catalog" 
+              className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {t('all')}
             </Link>
             <Link 
               to="/new-arrivals" 

@@ -35,7 +35,7 @@ const CatalogHero = ({ selectedGender, switchGender }: CatalogHeroProps) => {
           <Button 
             variant={selectedGender === "all" ? "default" : "outline"}
             onClick={() => switchGender("all")}
-            className="px-8"
+            className="px-8 text-black"
           >
             <Users className="mr-2 h-4 w-4" />
             {t("all")}
@@ -43,14 +43,14 @@ const CatalogHero = ({ selectedGender, switchGender }: CatalogHeroProps) => {
           <Button 
             variant={selectedGender === "men" ? "default" : "outline"}
             onClick={() => switchGender("men")}
-            className="px-8"
+            className="px-8 text-black"
           >
             {t("men")}
           </Button>
           <Button 
             variant={selectedGender === "women" ? "default" : "outline"}
             onClick={() => switchGender("women")}
-            className="px-8"
+            className="px-8 text-black"
           >
             {t("women")}
           </Button>
