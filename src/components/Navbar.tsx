@@ -4,13 +4,21 @@ import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/hooks/useCart';
-import { ShoppingBag, Menu, X } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { ShoppingBag, Menu, X, User, LogOut } from 'lucide-react';
 import Cart from './Cart';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/hooks/useLanguage';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const Navbar = () => {
   const { getTotalItems } = useCart();
+  const { user, logout, isAuthenticated } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { t } = useLanguage();
@@ -56,10 +64,37 @@ const Navbar = () => {
           </Link>
         </nav>
 
-        {/* Cart, Language Selector & Mobile Menu */}
+        {/* Cart, Auth, Language Selector & Mobile Menu */}
         <div className="flex items-center space-x-2">
           {/* Language Selector */}
           <LanguageSelector />
+
+          {/* Authentication */}
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative">
+                  <User className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="flex flex-col items-start">
+                  <span className="font-medium">{user?.name}</span>
+                  <span className="text-xs text-muted-foreground">{user?.email}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/auth">
+              <Button variant="ghost" size="icon">
+                <User className="h-6 w-6" />
+              </Button>
+            </Link>
+          )}
 
           {/* Cart */}
           <Sheet>
@@ -129,6 +164,16 @@ const Navbar = () => {
             >
               {t('bestsellers')}
             </Link>
+            {/* Mobile Auth */}
+            {!isAuthenticated && (
+              <Link 
+                to="/auth" 
+                className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Login / Register
+              </Link>
+            )}
           </div>
         </div>
       )}

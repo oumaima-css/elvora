@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -10,7 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useLanguage } from '@/hooks/useLanguage';
-import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface LoginFormData {
   email: string;
@@ -23,9 +24,18 @@ interface RegisterFormData extends LoginFormData {
 
 const AuthPage = () => {
   const { t } = useLanguage();
+  const { login, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate]);
+
   // Login form setup
   const loginForm = useForm<LoginFormData>({
     defaultValues: {
@@ -46,20 +56,25 @@ const AuthPage = () => {
   const onLogin = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      // Here we would normally connect to a backend API for authentication
-      // For now, we'll just simulate a successful login
-      console.log('Login data:', data);
+      const success = await login(data.email, data.password);
       
-      toast({
-        title: "Success",
-        description: "You have been logged in successfully!",
-      });
-      
-      // In a real implementation, you'd store the auth token and redirect
+      if (success) {
+        toast({
+          title: "Success",
+          description: "You have been logged in successfully!",
+        });
+        navigate('/');
+      } else {
+        toast({
+          title: "Error",
+          description: "Incorrect email or password. Please try again.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to login. Please check your credentials.",
+        description: "Failed to login. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -80,16 +95,12 @@ const AuthPage = () => {
         return;
       }
       
-      // Here we would normally connect to a backend API for registration
-      // For now, we'll just simulate a successful registration
-      console.log('Register data:', data);
-      
+      // For now, just show a message that registration is not implemented
       toast({
-        title: "Success",
-        description: "Your account has been created successfully!",
+        title: "Info",
+        description: "Registration is not available yet. Please use the login form.",
+        variant: "destructive",
       });
-      
-      // In a real implementation, you'd store the auth token and redirect
     } catch (error) {
       toast({
         title: "Error",

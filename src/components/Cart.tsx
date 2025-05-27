@@ -67,7 +67,13 @@ const Cart = () => {
                 {items.map((item) => (
                   <CartItem 
                     key={`${item.product.id}-${item.selectedColor || 'default'}`} 
-                    {...item}
+                    id={item.product.id}
+                    name={item.product.name}
+                    price={item.product.price}
+                    image={item.product.images[0]?.url || '/placeholder.svg'}
+                    quantity={item.quantity}
+                    selectedColor={item.selectedColor}
+                    selectedSize={item.selectedSize}
                   />
                 ))}
               </div>
