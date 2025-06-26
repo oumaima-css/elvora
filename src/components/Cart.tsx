@@ -10,11 +10,11 @@ import { Link } from 'react-router-dom';
 import { useLanguage } from '@/hooks/useLanguage';
 
 const Cart = () => {
-  const { items, getTotal, getTotalItems, clearCart } = useCart();
+  const { items, getTotalPrice, getTotalItems, clearCart } = useCart();
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useLanguage();
 
-  const total = getTotal();
+  const total = getTotalPrice();
   const itemCount = getTotalItems();
 
   const handleCheckout = () => {
