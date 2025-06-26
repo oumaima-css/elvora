@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { CartProvider } from "@/hooks/useCart";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { AuthProvider } from "@/hooks/useAuth";
+import CoverPage from "./pages/CoverPage";
 import Index from "./pages/Index";
 import CatalogPage from "./pages/CatalogPage";
 import ProductPage from "./pages/ProductPage";
@@ -35,7 +36,8 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<CoverPage />} />
+                <Route path="/home" element={<Index />} />
                 <Route path="/catalog" element={<CatalogPage />} />
                 <Route path="/catalog/:gender" element={<CatalogPage />} />
                 <Route path="/product/:id" element={<ProductPage />} />

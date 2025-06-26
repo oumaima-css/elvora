@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -34,7 +33,7 @@ const AuthPage = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/home');
     }
   }, [isAuthenticated, navigate]);
 
@@ -67,7 +66,7 @@ const AuthPage = () => {
           title: "Success",
           description: "You have been logged in successfully!",
         });
-        navigate('/');
+        navigate('/home');
       } else {
         toast({
           title: "Error",
@@ -132,7 +131,7 @@ const AuthPage = () => {
       title: "Success",
       description: "Logged in as guest!",
     });
-    navigate('/');
+    navigate('/home');
   };
 
   return (
