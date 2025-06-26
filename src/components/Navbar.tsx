@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -81,6 +80,12 @@ const Navbar = () => {
                 <DropdownMenuItem className="flex flex-col items-start">
                   <span className="font-medium">{user?.name}</span>
                   <span className="text-xs text-muted-foreground">{user?.email}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="w-full">
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -165,7 +170,26 @@ const Navbar = () => {
               {t('bestsellers')}
             </Link>
             {/* Mobile Auth */}
-            {!isAuthenticated && (
+            {isAuthenticated ? (
+              <>
+                <Link 
+                  to="/profile" 
+                  className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <button 
+                  onClick={() => {
+                    logout();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md text-left"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
               <Link 
                 to="/auth" 
                 className="text-evermore-dark px-4 py-2 hover:bg-muted rounded-md"

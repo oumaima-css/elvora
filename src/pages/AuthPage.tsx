@@ -20,11 +20,13 @@ interface LoginFormData {
 
 interface RegisterFormData extends LoginFormData {
   confirmPassword: string;
+  name: string; 
+  lastName: string; 
 }
 
 const AuthPage = () => {
   const { t } = useLanguage();
-  const { login, isAuthenticated } = useAuth();
+  const { login, register, loginAsGuest, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -50,6 +52,8 @@ const AuthPage = () => {
       email: '',
       password: '',
       confirmPassword: '',
+      name: '',
+      lastName: '',
     },
   });
 
@@ -85,7 +89,6 @@ const AuthPage = () => {
   const onRegister = async (data: RegisterFormData) => {
     setIsLoading(true);
     try {
-      // Check if passwords match
       if (data.password !== data.confirmPassword) {
         toast({
           title: "Error",
@@ -94,13 +97,24 @@ const AuthPage = () => {
         });
         return;
       }
+
+      const success = await register(data.email, data.password, data.name, data.lastName);
       
-      // For now, just show a message that registration is not implemented
-      toast({
-        title: "Info",
-        description: "Registration is not available yet. Please use the login form.",
-        variant: "destructive",
-      });
+      if (success) {
+        toast({
+          title: "Success",
+          description: "Account created successfully! Please login.",
+        });
+        // Switch to login tab after successful registration
+        const loginTab = document.querySelector('[value="login"]') as HTMLElement;
+        loginTab?.click();
+      } else {
+        toast({
+          title: "Error",
+          description: "User already exists or registration failed.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
         title: "Error",
@@ -112,6 +126,15 @@ const AuthPage = () => {
     }
   };
 
+  const handleGuestLogin = () => {
+    loginAsGuest();
+    toast({
+      title: "Success",
+      description: "Logged in as guest!",
+    });
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -119,6 +142,18 @@ const AuthPage = () => {
       <main className="flex-grow pt-24 pb-16">
         <div className="luxury-container">
           <div className="max-w-md mx-auto">
+            {/* Guest Login Button */}
+            <div className="mb-6 text-center">
+              <Button 
+                onClick={handleGuestLogin}
+                variant="outline" 
+                className="w-full mb-4"
+              >
+                Continue as Guest
+              </Button>
+              <p className="text-sm text-muted-foreground">Or create an account / login below</p>
+            </div>
+
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid grid-cols-2 mb-6">
                 <TabsTrigger value="login">{t('login')}</TabsTrigger>
@@ -180,6 +215,34 @@ const AuthPage = () => {
                   <CardContent>
                     <Form {...registerForm}>
                       <form onSubmit={registerForm.handleSubmit(onRegister)} className="space-y-4">
+                        <FormField
+                          control={registerForm.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>First Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="First Name" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        
+                        <FormField
+                          control={registerForm.control}
+                          name="lastName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Last Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Last Name" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
                         <FormField
                           control={registerForm.control}
                           name="email"
