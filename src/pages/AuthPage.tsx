@@ -172,6 +172,13 @@ const AuthPage = () => {
                         <FormField
                           control={loginForm.control}
                           name="email"
+                          rules={{
+                            required: "Email is required",
+                            pattern: {
+                              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                              message: "Invalid email address",
+                            },
+                          }}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('email')}</FormLabel>
@@ -186,6 +193,13 @@ const AuthPage = () => {
                         <FormField
                           control={loginForm.control}
                           name="password"
+                          rules={{
+                            required: "Password is required",
+                            minLength: {
+                              value: 6,
+                              message: "Password must be at least 6 characters",
+                            },
+                          }}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('password')}</FormLabel>
@@ -218,6 +232,13 @@ const AuthPage = () => {
                         <FormField
                           control={registerForm.control}
                           name="name"
+                          rules={{
+                            required: "First name is required",
+                            minLength: {
+                              value: 2,
+                              message: "Name must be at least 2 characters",
+                            },
+                          }}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>First Name</FormLabel>
@@ -232,6 +253,13 @@ const AuthPage = () => {
                         <FormField
                           control={registerForm.control}
                           name="lastName"
+                          rules={{
+                            required: "Last name is required",
+                            minLength: {
+                              value: 2,
+                              message: "Last name must be at least 2 characters",
+                            },
+                          }}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Last Name</FormLabel>
@@ -246,6 +274,13 @@ const AuthPage = () => {
                         <FormField
                           control={registerForm.control}
                           name="email"
+                          rules={{
+                            required: "Email is required",
+                            pattern: {
+                              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                              message: "Invalid email address",
+                            },
+                          }}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('email')}</FormLabel>
@@ -260,6 +295,13 @@ const AuthPage = () => {
                         <FormField
                           control={registerForm.control}
                           name="password"
+                          rules={{
+                            required: "Password is required",
+                            minLength: {
+                              value: 6,
+                              message: "Password must be at least 6 characters",
+                            },
+                          }}
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>{t('password')}</FormLabel>
@@ -274,15 +316,36 @@ const AuthPage = () => {
                         <FormField
                           control={registerForm.control}
                           name="confirmPassword"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>{t('confirm_password')}</FormLabel>
-                              <FormControl>
-                                <Input type="password" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
+                          rules={{
+                            required: "Please confirm your password",
+                            validate: (value) => {
+                              const password = registerForm.getValues('password');
+                              return value === password || "Passwords do not match";
+                            },
+                          }}
+                          render={({ field }) => {
+                            const password = registerForm.watch('password');
+                            const confirmPassword = field.value;
+                            const isMatched = password === confirmPassword && confirmPassword !== '';
+                            const hasError = confirmPassword !== '' && password !== confirmPassword;
+
+                            return (
+                              <FormItem>
+                                <FormLabel>{t('confirm_password')}</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="password" 
+                                    {...field} 
+                                    className={`${
+                                      isMatched ? 'border-green-500 bg-green-50' : 
+                                      hasError ? 'border-red-500 bg-red-50' : ''
+                                    }`}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
                         />
                         
                         <Button type="submit" className="w-full" disabled={isLoading}>

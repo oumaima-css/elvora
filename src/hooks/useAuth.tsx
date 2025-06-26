@@ -33,19 +33,22 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const users: { email: string; password: string; name: string; lastName?: string }[] = [
+    { email: 'oumaima.bendahan@avaliance.com', password: 'oumaima123$', name: 'Oumaima', lastName: 'Bendahan' }
+  ];
 
   const login = async (email: string, password: string): Promise<boolean> => {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Check credentials
-    if (email === 'oumaima.bendahan@avaliance.com' && password === 'oumaima123$') {
-      const userData = {
-        email: email,
-        name: 'Oumaima',
-        lastName: 'Bendahan'
-      };
-      setUser(userData);
+    const foundUser = users.find(user => user.email === email && user.password === password);
+    if (foundUser) {
+      setUser({
+        email: foundUser.email,
+        name: foundUser.name,
+        lastName: foundUser.lastName
+      });
       return true;
     }
     return false;
@@ -54,8 +57,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const register = async (email: string, password: string, name: string, lastName?: string): Promise<boolean> => {
     // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // For demo purposes, always succeed but don't automatically log in
+
+    // Check if the user already exists
+    const existingUser = users.find(user => user.email === email);
+    if (existingUser) {
+      return false; // User already exists
+    }
+
+    // Create a new user
+    const newUser = { email, password, name, lastName };
+    users.push(newUser);
     return true;
   };
 
