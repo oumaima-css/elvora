@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -62,7 +61,7 @@ const CheckoutPage = () => {
       city: '',
       state: '',
       postalCode: '',
-      country: 'US',
+      country: 'morocco', // Fixed: changed from 'US' to 'morocco'
     }
   });
   

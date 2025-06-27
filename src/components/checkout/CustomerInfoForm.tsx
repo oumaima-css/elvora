@@ -21,13 +21,10 @@ const COUNTRY_CODES = [
   { country: "Morocco", code: "+212", format: "+212 XXXXXXXXX", digits: 9 },
   { country: "France", code: "+33", format: "+33 X XX XX XX XX", digits: 9 },
   { country: "Spain", code: "+34", format: "+34 XXX XXX XXX", digits: 9 },
-  { country: "USA", code: "+1", format: "+1 XXX XXX XXXX", digits: 10 },
   { country: "UK", code: "+44", format: "+44 XXXX XXXXXX", digits: 10 },
-  { country: "Germany", code: "+49", format: "+49 XXX XXXXXXX", digits: 10 },
   { country: "Italy", code: "+39", format: "+39 XXX XXX XXXX", digits: 10 },
-  { country: "Canada", code: "+1", format: "+1 XXX XXX XXXX", digits: 10 },
   { country: "UAE", code: "+971", format: "+971 XX XXX XXXX", digits: 8 },
-  { country: "Saudi Arabia", code: "+966", format: "+966 XX XXX XXXX", digits: 8 },
+  { country: "China", code: "+86", format: "+86 XXX XXXX XXXX", digits: 11 },
 ];
 
 const countryCityMap = {
@@ -40,16 +37,16 @@ const countryCityMap = {
   uk: [
     "London", "Manchester", "Birmingham", "Glasgow", "Liverpool", "Bristol", "Leeds", "Edinburgh"
   ],
-  esp: [
-    "Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Málaga", "Murcia", "Palma"
-  ],
-  it: [
-    "Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna", "Florence"
-  ],
-  fr: [
+  france: [
     "Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg", "Montpellier"
   ],
-  cn: [
+  spain: [
+    "Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Málaga", "Murcia", "Palma"
+  ],
+  italy: [
+    "Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna", "Florence"
+  ],
+  china: [
     "Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Chengdu", "Hangzhou", "Wuhan", "Xi'an"
   ],
 };
@@ -58,10 +55,10 @@ const countries = [
   { code: "morocco", label: "Morocco" },
   { code: "uae", label: "UAE" },
   { code: "uk", label: "UK" },
-  { code: "esp", label: "Spain" },
-  { code: "it", label: "Italy" },
-  { code: "fr", label: "France" },
-  { code: "cn", label: "China" },
+  { code: "france", label: "France" },
+  { code: "spain", label: "Spain" },
+  { code: "italy", label: "Italy" },
+  { code: "china", label: "China" },
 ];
 
 const checkoutSchema = z.object({
@@ -69,12 +66,18 @@ const checkoutSchema = z.object({
     .string()
     .min(2, { message: "Full name must be at least 2 characters" })
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, { message: "Full name can only contain letters and spaces" }),
-  email: z.string().email({ message: "Valid email is required" }),
+  email: z
+    .string()
+    .email({ message: "Valid email is required" })
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: "Email must be in format: something@something.something" }),
   countryCode: z.string().min(1, { message: "Country code is required" }),
   phone: z
     .string()
     .min(5, { message: "Phone number is required" }),
-  address: z.string().min(5, { message: "Address is required" }),
+  address: z
+    .string()
+    .min(5, { message: "Address is required" })
+    .regex(/^[A-Za-z0-9\s]+$/, { message: "Address can only contain letters, numbers and spaces" }),
   city: z
     .string()
     .min(2, { message: "City is required" }),
@@ -90,10 +93,10 @@ const checkoutSchema = z.object({
     "morocco",
     "uae",
     "uk",
-    "esp",
-    "it",
-    "fr",
-    "cn",
+    "france",
+    "spain",
+    "italy",
+    "china",
   ], { errorMap: () => ({ message: "Country is required" }) }),
 });
 
@@ -247,7 +250,14 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
             <FormItem className="mb-4">
               <FormLabel>{t("street_address")}</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input 
+                  {...field} 
+                  onChange={(e) => {
+                    // Only allow letters, numbers and spaces
+                    const sanitized = e.target.value.replace(/[^A-Za-z0-9\s]/g, '');
+                    field.onChange(sanitized);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -322,7 +332,14 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
               <FormItem>
                 <FormLabel>{t("state_province")}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input 
+                    {...field} 
+                    onChange={(e) => {
+                      // Only allow letters and spaces
+                      const sanitized = e.target.value.replace(/[^A-Za-z\s]/g, '');
+                      field.onChange(sanitized);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -335,7 +352,14 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
               <FormItem>
                 <FormLabel>{t("postal_code")}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input 
+                    {...field} 
+                    onChange={(e) => {
+                      // Only allow numbers
+                      const sanitized = e.target.value.replace(/[^\d]/g, '');
+                      field.onChange(sanitized);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
