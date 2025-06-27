@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -30,7 +31,7 @@ const MINIMUM_ORDER_VALUE = 249;
 const CheckoutPage = () => {
   const { items, getTotalPrice, clearCart } = useCart();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('credit-card');
@@ -61,7 +62,7 @@ const CheckoutPage = () => {
       city: '',
       state: '',
       postalCode: '',
-      country: 'morocco', // Fixed: changed from 'US' to 'morocco'
+      country: 'morocco',
     }
   });
   
@@ -97,10 +98,11 @@ const CheckoutPage = () => {
         
       const total = discountedSubtotal + shippingCost;
       
+      // Generate order ID
+      const orderId = Math.random().toString(36).substr(2, 9);
+      
       // Handle Cash on Delivery
       if (paymentMethod === 'cash-on-delivery') {
-        const orderId = Math.random().toString(36).substr(2, 9);
-        
         // Clear the cart and redirect to cash order confirmation page
         clearCart();
         navigate('/cash-order-confirmation', { 
@@ -121,7 +123,7 @@ const CheckoutPage = () => {
       }
       
       // Process regular payment (existing code for other payment methods)
-      const orderId = await processPayment();
+      await processPayment();
       
       // Clear the cart and redirect to regular confirmation page
       clearCart();
@@ -134,7 +136,8 @@ const CheckoutPage = () => {
           total: total,
           originalTotal: subtotal,
           discountPercent: appliedDiscount,
-          items: items.length
+          items: items,
+          paymentMethod: paymentMethod
         } 
       });
       
@@ -174,8 +177,6 @@ const CheckoutPage = () => {
   
   // Check if order meets minimum value
   const isBelowMinimum = subtotal < MINIMUM_ORDER_VALUE;
-  
-  const { language } = useLanguage();
   
   if (items.length === 0) {
     return (
