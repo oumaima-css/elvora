@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SupportedLanguage, getCurrentLanguage, setCurrentLanguage } from '@/lib/utils';
 
@@ -102,7 +101,19 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     
     // Special sale
     'special_sale': 'Special Sale',
-    'discount_desc': 'Get up to 30% OFF on selected items'
+    'discount_desc': 'Get up to 30% OFF on selected items',
+    
+    // Additional translations for new features
+    'Cash on Delivery': 'Cash on Delivery',
+    'Pay on Delivery': 'Pay on Delivery',
+    'Pay with cash when your order arrives at your doorstep.': 'Pay with cash when your order arrives at your doorstep.',
+    'Please have the exact amount ready for the delivery person.': 'Please have the exact amount ready for the delivery person.',
+    'Cash on delivery order placed successfully!': 'Cash on delivery order placed successfully!',
+    'Minimum Order Value Required': 'Minimum Order Value Required',
+    'Orders must be at least': 'Orders must be at least',
+    'Your current subtotal is': 'Your current subtotal is',
+    'Minimum': 'Minimum',
+    'Required': 'Required',
   },
   fr: {
     // Navigation
@@ -202,7 +213,19 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     
     // Special sale
     'special_sale': 'Vente Spéciale',
-    'discount_desc': 'Obtenez jusqu\'à 30% de réduction sur certains articles'
+    'discount_desc': 'Obtenez jusqu\'à 30% de réduction sur certains articles',
+    
+    // Additional translations for new features
+    'Cash on Delivery': 'Paiement à la livraison',
+    'Pay on Delivery': 'Payer à la livraison',
+    'Pay with cash when your order arrives at your porte.': 'Payez en espèces lorsque votre commande arrive à votre porte.',
+    'Please have the exact amount ready for the delivery person.': 'Veuillez avoir le montant exact prêt pour le livreur.',
+    'Cash on delivery order placed successfully!': 'Commande à la livraison passée avec succès!',
+    'Minimum Order Value Required': 'Valeur minimum de commande requise',
+    'Orders must be at least': 'Les commandes doivent être d\'au moins',
+    'Your current subtotal is': 'Votre sous-total actuel est',
+    'Minimum': 'Minimum',
+    'Required': 'Requis',
   },
   ar: {
     // Navigation
@@ -302,7 +325,19 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     
     // Special sale
     'special_sale': 'عرض خاص',
-    'discount_desc': 'احصل على خصم يصل إلى 30٪ على منتجات مختارة'
+    'discount_desc': 'احصل على خصم يصل إلى 30٪ على منتجات مختارة',
+    
+    // Additional translations for new features
+    'Cash on Delivery': 'الدفع عند الاستلام',
+    'Pay on Delivery': 'الدفع عند التسليم',
+    'Pay with cash when your order arrives at your doorstep.': 'ادفع نقداً عند وصول طلبك إلى عتبة داركم.',
+    'Please have the exact amount ready for the delivery person.': 'يرجى إعداد المبلغ الصحيح لعامل التوصيل.',
+    'Cash on delivery order placed successfully!': 'تم تأكيد طلب الدفع عند الاستلام بنجاح!',
+    'Minimum Order Value Required': 'مطلوب قيمة طلب أدنى',
+    'Orders must be at least': 'يجب أن تكون الطلبات على الأقل',
+    'Your current subtotal is': 'المجموع الفرعي الحالي هو',
+    'Minimum': 'الحد الأدنى',
+    'Required': 'مطلوب',
   }
 };
 

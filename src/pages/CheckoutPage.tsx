@@ -41,8 +41,11 @@ const CheckoutPage = () => {
   // Initialize the form with react-hook-form and zod validation
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(z.object({
-      fullName: z.string().min(3, { message: "Full name is required" }),
+      fullName: z.string()
+        .min(2, { message: "Full name must be at least 2 characters" })
+        .regex(/^[A-Za-zÀ-ÿ\s]+$/, { message: "Full name can only contain letters and spaces" }),
       email: z.string().email({ message: "Valid email is required" }),
+      countryCode: z.string().min(1, { message: "Country code is required" }),
       phone: z.string().min(5, { message: "Phone number is required" }),
       address: z.string().min(5, { message: "Address is required" }),
       city: z.string().min(2, { message: "City is required" }),
@@ -53,6 +56,7 @@ const CheckoutPage = () => {
     defaultValues: {
       fullName: '',
       email: '',
+      countryCode: '+212',
       phone: '',
       address: '',
       city: '',

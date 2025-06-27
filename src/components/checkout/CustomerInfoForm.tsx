@@ -13,11 +13,29 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Country codes with their phone number formats
+const COUNTRY_CODES = [
+  { country: "Morocco", code: "+212", format: "+212 XXXXXXXXX", digits: 9 },
+  { country: "France", code: "+33", format: "+33 X XX XX XX XX", digits: 9 },
+  { country: "Spain", code: "+34", format: "+34 XXX XXX XXX", digits: 9 },
+  { country: "USA", code: "+1", format: "+1 XXX XXX XXXX", digits: 10 },
+  { country: "UK", code: "+44", format: "+44 XXXX XXXXXX", digits: 10 },
+  { country: "Germany", code: "+49", format: "+49 XXX XXXXXXX", digits: 10 },
+  { country: "Italy", code: "+39", format: "+39 XXX XXX XXXX", digits: 10 },
+  { country: "Canada", code: "+1", format: "+1 XXX XXX XXXX", digits: 10 },
+  { country: "UAE", code: "+971", format: "+971 XX XXX XXXX", digits: 8 },
+  { country: "Saudi Arabia", code: "+966", format: "+966 XX XXX XXXX", digits: 8 },
+];
 
 // Create a schema for form validation
 const checkoutSchema = z.object({
-  fullName: z.string().min(3, { message: "Full name is required" }),
+  fullName: z.string()
+    .min(2, { message: "Full name must be at least 2 characters" })
+    .regex(/^[A-Za-zÀ-ÿ\s]+$/, { message: "Full name can only contain letters and spaces" }),
   email: z.string().email({ message: "Valid email is required" }),
+  countryCode: z.string().min(1, { message: "Country code is required" }),
   phone: z.string().min(5, { message: "Phone number is required" }),
   address: z.string().min(5, { message: "Address is required" }),
   city: z.string().min(2, { message: "City is required" }),
@@ -34,6 +52,22 @@ interface CustomerInfoFormProps {
 
 const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
   const { t } = useLanguage();
+
+  const validatePhoneNumber = (phone: string, countryCode: string): boolean => {
+    const countryData = COUNTRY_CODES.find(c => c.code === countryCode);
+    if (!countryData) return false;
+    
+    // Remove country code and check if remaining digits match expected length
+    const phoneWithoutCode = phone.replace(countryCode, '').replace(/\s/g, '');
+    const isNumeric = /^\d+$/.test(phoneWithoutCode);
+    const hasCorrectLength = phoneWithoutCode.length === countryData.digits;
+    
+    return isNumeric && hasCorrectLength;
+  };
+
+  const getCurrentCountryData = (countryCode: string) => {
+    return COUNTRY_CODES.find(c => c.code === countryCode) || COUNTRY_CODES[0];
+  };
 
   return (
     <div className="lg:col-span-2">
@@ -52,7 +86,14 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
               <FormItem>
                 <FormLabel>{t("Full Name")}</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input 
+                    {...field} 
+                    onChange={(e) => {
+                      // Only allow letters and spaces
+                      const sanitized = e.target.value.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
+                      field.onChange(sanitized);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -73,22 +114,59 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>
-                <Phone className="inline mr-2" size={16} />
-                {t("Phone Number")}
-              </FormLabel>
-              <FormControl>
-                <Input {...field} type="tel" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Phone Number with Country Code */}
+        <div className="mb-4">
+          <FormLabel>
+            <Phone className="inline mr-2" size={16} />
+            {t("Phone Number")}
+          </FormLabel>
+          <div className="flex gap-2">
+            <FormField
+              control={form.control}
+              name="countryCode"
+              render={({ field }) => (
+                <FormItem className="w-40">
+                  <FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={"+212"}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COUNTRY_CODES.map((country) => (
+                          <SelectItem key={country.code} value={country.code}>
+                            {country.code} ({country.country})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      type="tel" 
+                      placeholder={getCurrentCountryData(form.watch("countryCode") || "+212").format}
+                      onChange={(e) => {
+                        // Only allow numbers and spaces
+                        const sanitized = e.target.value.replace(/[^\d\s]/g, '');
+                        field.onChange(sanitized);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Shipping Information */}
