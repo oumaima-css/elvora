@@ -1,5 +1,6 @@
 
-import { z } from "zod";
+import { useState, useEffect } from "react";
+import { z } from "zod"; 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { User, Phone, MapPin, Building, Flag } from "lucide-react";
@@ -13,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; 
 
 // Country codes with their phone number formats
 const COUNTRY_CODES = [
@@ -29,19 +30,71 @@ const COUNTRY_CODES = [
   { country: "Saudi Arabia", code: "+966", format: "+966 XX XXX XXXX", digits: 8 },
 ];
 
-// Create a schema for form validation
+const countryCityMap = {
+  morocco: [
+    "Casablanca", "Rabat", "Marrakech", "Fes", "Tangier", "Agadir", "Meknes", "Oujda"
+  ],
+  uae: [
+    "Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Fujairah", "Ras Al Khaimah", "Umm Al Quwain", "Al Ain"
+  ],
+  uk: [
+    "London", "Manchester", "Birmingham", "Glasgow", "Liverpool", "Bristol", "Leeds", "Edinburgh"
+  ],
+  esp: [
+    "Madrid", "Barcelona", "Valencia", "Seville", "Zaragoza", "Málaga", "Murcia", "Palma"
+  ],
+  it: [
+    "Rome", "Milan", "Naples", "Turin", "Palermo", "Genoa", "Bologna", "Florence"
+  ],
+  fr: [
+    "Paris", "Marseille", "Lyon", "Toulouse", "Nice", "Nantes", "Strasbourg", "Montpellier"
+  ],
+  cn: [
+    "Beijing", "Shanghai", "Guangzhou", "Shenzhen", "Chengdu", "Hangzhou", "Wuhan", "Xi'an"
+  ],
+};
+
+const countries = [
+  { code: "morocco", label: "Morocco" },
+  { code: "uae", label: "UAE" },
+  { code: "uk", label: "UK" },
+  { code: "esp", label: "Spain" },
+  { code: "it", label: "Italy" },
+  { code: "fr", label: "France" },
+  { code: "cn", label: "China" },
+];
+
 const checkoutSchema = z.object({
-  fullName: z.string()
+  fullName: z
+    .string()
     .min(2, { message: "Full name must be at least 2 characters" })
     .regex(/^[A-Za-zÀ-ÿ\s]+$/, { message: "Full name can only contain letters and spaces" }),
   email: z.string().email({ message: "Valid email is required" }),
   countryCode: z.string().min(1, { message: "Country code is required" }),
-  phone: z.string().min(5, { message: "Phone number is required" }),
+  phone: z
+    .string()
+    .min(5, { message: "Phone number is required" }),
   address: z.string().min(5, { message: "Address is required" }),
-  city: z.string().min(2, { message: "City is required" }),
-  state: z.string().min(2, { message: "State/Province is required" }),
-  postalCode: z.string().min(3, { message: "Postal code is required" }),
-  country: z.string().min(2, { message: "Country is required" }),
+  city: z
+    .string()
+    .min(2, { message: "City is required" }),
+  state: z
+    .string()
+    .min(2, { message: "State/Province is required" })
+    .regex(/^[A-Za-z\s]+$/, { message: "State/Province must contain only letters" }),
+  postalCode: z
+    .string()
+    .min(3, { message: "Postal code is required" })
+    .regex(/^\d+$/, { message: "Postal code must contain only digits" }),
+  country: z.enum([
+    "morocco",
+    "uae",
+    "uk",
+    "esp",
+    "it",
+    "fr",
+    "cn",
+  ], { errorMap: () => ({ message: "Country is required" }) }),
 });
 
 export type CheckoutFormValues = z.infer<typeof checkoutSchema>;
@@ -52,6 +105,17 @@ interface CustomerInfoFormProps {
 
 const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
   const { t } = useLanguage();
+  const [cities, setCities] = useState<string[]>(countryCityMap["morocco"]);
+
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      if (value.country && countryCityMap[value.country]) {
+        setCities(countryCityMap[value.country]);
+        form.setValue("city", "");
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const validatePhoneNumber = (phone: string, countryCode: string): boolean => {
     const countryData = COUNTRY_CODES.find(c => c.code === countryCode);
@@ -75,7 +139,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
       <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
         <h2 className="text-xl font-serif font-medium mb-4">
           <User className="inline mr-2" size={20} />
-          {t("Customer Information")}
+          {t("customer_information")}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -84,7 +148,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
             name="fullName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Full Name")}</FormLabel>
+                <FormLabel>{t("full_name")}</FormLabel>
                 <FormControl>
                   <Input 
                     {...field} 
@@ -104,7 +168,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Email Address")}</FormLabel>
+                <FormLabel>{t("email_address")}</FormLabel>
                 <FormControl>
                   <Input {...field} type="email" />
                 </FormControl>
@@ -118,7 +182,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
         <div className="mb-4">
           <FormLabel>
             <Phone className="inline mr-2" size={16} />
-            {t("Phone Number")}
+            {t("phone_number")}
           </FormLabel>
           <div className="flex gap-2">
             <FormField
@@ -173,7 +237,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
       <div className="bg-white p-6 rounded-lg shadow-sm border mb-8">
         <h2 className="text-xl font-serif font-medium mb-4">
           <MapPin className="inline mr-2" size={20} />
-          {t("Shipping Information")}
+          {t("shipping_information")}
         </h2>
 
         <FormField
@@ -181,7 +245,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
           name="address"
           render={({ field }) => (
             <FormItem className="mb-4">
-              <FormLabel>{t("Street Address")}</FormLabel>
+              <FormLabel>{t("street_address")}</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -189,6 +253,37 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="country"
+          render={({ field }) => (
+            <FormItem className="mt-4">
+              <FormLabel>
+                <Flag className="inline mr-2" size={16} />
+                {t("country")}
+              </FormLabel>
+              <FormControl>
+                <select
+                  {...field}
+                  className="w-full border rounded px-3 py-2"
+                  defaultValue="morocco"
+                  onChange={(e) => {
+                    field.onChange(e);
+                  }}
+                >
+                  {countries.map(({ code, label }) => (
+                    <option key={code} value={code}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <br/>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <FormField
@@ -198,10 +293,23 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
               <FormItem>
                 <FormLabel>
                   <Building className="inline mr-2" size={16} />
-                  {t("City")}
+                  {t("city")}
                 </FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <select
+                    {...field}
+                    className="w-full border rounded px-3 py-2"
+                    onChange={(e) => {
+                      field.onChange(e);
+                    }}
+                  >
+                    <option value="">-- {t('select_city')} --</option>
+                    {cities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -212,7 +320,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
             name="state"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("State/Province")}</FormLabel>
+                <FormLabel>{t("state_province")}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -225,7 +333,7 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
             name="postalCode"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{t("Postal Code")}</FormLabel>
+                <FormLabel>{t("postal_code")}</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -234,23 +342,6 @@ const CustomerInfoForm = ({ form }: CustomerInfoFormProps) => {
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem className="mt-4">
-              <FormLabel>
-                <Flag className="inline mr-2" size={16} />
-                {t("Country")}
-              </FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </div>
     </div>
   );
