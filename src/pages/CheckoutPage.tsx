@@ -84,9 +84,6 @@ const CheckoutPage = () => {
     setIsProcessing(true);
     
     try {
-      // Process the payment (this would be replaced with Stripe)
-      const orderId = await processPayment();
-      
       // Calculate the final amount with discount and shipping
       const isShippingFree = isEligibleForFreeShipping(subtotal);
       const shippingCost = isShippingFree ? 0 : SHIPPING_FEE;
@@ -97,7 +94,33 @@ const CheckoutPage = () => {
         
       const total = discountedSubtotal + shippingCost;
       
-      // Clear the cart and redirect to confirmation page with all order details
+      // Handle Cash on Delivery
+      if (paymentMethod === 'cash-on-delivery') {
+        const orderId = Math.random().toString(36).substr(2, 9);
+        
+        // Clear the cart and redirect to cash order confirmation page
+        clearCart();
+        navigate('/cash-order-confirmation', { 
+          state: { 
+            orderId,
+            customerInfo: data,
+            subtotal: subtotal,
+            shipping: shippingCost,
+            total: total,
+            originalTotal: subtotal,
+            discountPercent: appliedDiscount,
+            items: items
+          } 
+        });
+        
+        toast.success(t('Cash on delivery order placed successfully!'));
+        return;
+      }
+      
+      // Process regular payment (existing code for other payment methods)
+      const orderId = await processPayment();
+      
+      // Clear the cart and redirect to regular confirmation page
       clearCart();
       navigate('/order-confirmation', { 
         state: { 

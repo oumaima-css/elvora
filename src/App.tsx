@@ -12,6 +12,7 @@ import CatalogPage from "./pages/CatalogPage";
 import ProductPage from "./pages/ProductPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import CashOrderConfirmationPage from "./pages/CashOrderConfirmationPage";
 import NotFound from "./pages/NotFound";
 import AuthPage from "./pages/AuthPage";
 import AboutPage from "./pages/AboutPage";
@@ -43,6 +44,7 @@ const App = () => (
                 <Route path="/product/:id" element={<ProductPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+                <Route path="/cash-order-confirmation" element={<CashOrderConfirmationPage />} />
                 <Route path="/orders" element={<Navigate to="/auth" replace />} />
                 <Route path="/new-arrivals" element={<CatalogPage />} />
                 <Route path="/bestsellers" element={<CatalogPage />} />

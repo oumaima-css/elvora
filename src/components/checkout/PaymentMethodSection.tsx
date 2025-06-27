@@ -1,5 +1,4 @@
-
-import { CreditCard, CreditCardIcon, Wallet } from "lucide-react";
+import { CreditCard, CreditCardIcon, Wallet, Truck } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
@@ -28,7 +27,7 @@ const PaymentMethodSection = ({
         onValueChange={setPaymentMethod}
         value={paymentMethod}
       >
-        <TabsList className="mb-4 grid grid-cols-3 w-full">
+        <TabsList className="mb-4 grid grid-cols-4 w-full">
           <TabsTrigger
             value="credit-card"
             className="flex items-center gap-2"
@@ -39,6 +38,10 @@ const PaymentMethodSection = ({
           <TabsTrigger value="paypal" className="flex items-center gap-2">
             <CreditCardIcon className="h-4 w-4" />
             <span className="hidden sm:inline">PayPal</span>
+          </TabsTrigger>
+          <TabsTrigger value="cash-on-delivery" className="flex items-center gap-2">
+            <Truck className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("Cash on Delivery")}</span>
           </TabsTrigger>
           <TabsTrigger value="other" className="flex items-center gap-2">
             <Wallet className="h-4 w-4" />
@@ -105,6 +108,21 @@ const PaymentMethodSection = ({
             <Button type="button" className="bg-blue-500 hover:bg-blue-600">
               {t("Proceed with PayPal")}
             </Button>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="cash-on-delivery">
+          <div className="text-center py-6">
+            <Truck className="h-12 w-12 text-gold mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">{t("Pay on Delivery")}</h3>
+            <p className="text-muted-foreground mb-4">
+              {t("Pay with cash when your order arrives at your doorstep.")}
+            </p>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+              <p className="text-sm text-yellow-800">
+                {t("Please have the exact amount ready for the delivery person.")}
+              </p>
+            </div>
           </div>
         </TabsContent>
 
